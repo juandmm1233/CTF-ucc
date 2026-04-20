@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /admin.php
+Disallow: /includes/
+Disallow: /backup/
+
+# Nota del equipo de plataforma:
+# - /admin.php todavia valida el rol con la cookie 'role'. Revisar tras el CTF.
+# - Mover init.sql fuera de la imagen publica en el proximo release.
