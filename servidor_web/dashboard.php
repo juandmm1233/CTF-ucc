@@ -9,7 +9,7 @@ ctf_render_header('dashboard', 'Dashboard');
     <span class="material-icons">check_circle</span>
     <div>
         <strong>Bienvenido, <?php echo htmlspecialchars(ctf_current_user()); ?>.</strong>
-        <div>Te autenticaste correctamente en la consola CTF.</div>
+        <div>Te autenticaste correctamente en Ibague Data Services (IDS).</div>
     </div>
 </div>
 

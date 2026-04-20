@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/layout.php';
 ctf_require_login();
-ctf_render_header('logs', 'Cloud Logging');
+ctf_render_header('logs', 'IDS Observability');
 
 $now = time();
 function ctf_log_ts($offset) {

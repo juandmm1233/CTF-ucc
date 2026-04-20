@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/layout.php';
 ctf_require_login();
-ctf_render_header('storage', 'Cloud Storage');
+ctf_render_header('storage', 'IDS Storage');
 ?>
 
 <div class="gc-toolbar">
@@ -62,7 +62,7 @@ ctf_render_header('storage', 'Cloud Storage');
     <div class="gc-card-subheader">
         <h2 class="gc-h2"><span class="material-icons">article</span> welcome.txt</h2>
     </div>
-    <pre class="gc-code"># CTF Cloud - Bucket de backups
+    <pre class="gc-code"># IDS - Bucket de backups
 
 Este bucket contiene respaldos operativos.
 Si tu rol IAM es 'admin', podras acceder al panel de

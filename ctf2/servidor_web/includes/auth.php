@@ -1,5 +1,6 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
+    session_name('ctf2_sess');
     session_start();
 }
 
@@ -14,10 +15,6 @@ function ctf_current_user() {
     return isset($_SESSION['ctf_user']) ? $_SESSION['ctf_user'] : 'guest';
 }
 
-/**
- * Devuelve el rol actual de la sesion: 'admin', 'observador' o 'user'.
- * Se puebla durante el login exitoso en index.php.
- */
 function ctf_current_role() {
     return isset($_SESSION['ctf_role']) ? $_SESSION['ctf_role'] : 'user';
 }
@@ -31,9 +28,6 @@ function ctf_is_observer() {
     return $role === 'observador' || $role === 'observer';
 }
 
-/**
- * Bloquea endpoints de escritura para observadores y visitantes.
- */
 function ctf_require_admin() {
     if (!ctf_is_admin()) {
         http_response_code(403);

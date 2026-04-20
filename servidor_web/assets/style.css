@@ -67,6 +67,18 @@ html, body {
     letter-spacing: 0.1px;
 }
 
+.gc-appbar-subtitle {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--gc-blue);
+    border: 1px solid var(--gc-blue);
+    padding: 2px 6px;
+    border-radius: 12px;
+    letter-spacing: 1px;
+    margin-left: 4px;
+}
+
 .gc-appbar-actions {
     display: flex;
     align-items: center;

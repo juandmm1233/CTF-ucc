@@ -38,7 +38,7 @@ if ($mysqli === null) {
 
 <div class="gc-card gc-card-flat">
     <div class="gc-card-subheader">
-        <h2 class="gc-h2"><span class="material-icons">group</span> Principales del proyecto ctf-ucc-lab</h2>
+        <h2 class="gc-h2"><span class="material-icons">group</span> Principales del proyecto ids-ucc-lab</h2>
     </div>
     <table class="gc-table">
         <thead>
@@ -83,7 +83,7 @@ if ($mysqli === null) {
         <li><span class="material-icons" style="color:#c5221f;">warning</span> Autenticacion por contrasena habilitada en SSH (db_ssh)</li>
         <li><span class="material-icons" style="color:#c5221f;">warning</span> Endpoint /index.php construye SQL por concatenacion</li>
         <li><span class="material-icons" style="color:#c5221f;">warning</span> Existen usuarios con contrasenas del top-10 mas comunes</li>
-        <li><span class="material-icons" style="color:#137333;">check_circle</span> Logs de acceso centralizados en Cloud Logging</li>
+        <li><span class="material-icons" style="color:#137333;">check_circle</span> Logs de acceso centralizados en IDS Observability</li>
     </ul>
 </div>
 

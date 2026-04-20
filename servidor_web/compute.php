@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/layout.php';
 ctf_require_login();
-ctf_render_header('compute', 'Compute Engine');
+ctf_render_header('compute', 'IDS Compute');
 ?>
 
 <div class="gc-toolbar">
@@ -30,11 +30,11 @@ ctf_render_header('compute', 'Compute Engine');
                         <strong>ctf-db-ssh</strong>
                     </div>
                 </td>
-                <td>us-central1-a</td>
+                <td>ibague-1a</td>
                 <td><span class="gc-chip gc-chip-ok">RUNNING</span></td>
                 <td><code>db_ssh</code></td>
                 <td><code>22/tcp</code>, <code>3306/tcp</code></td>
-                <td>Database + SSH bastion</td>
+                <td>Base de datos + bastion SSH</td>
             </tr>
             <tr>
                 <td>
@@ -43,7 +43,7 @@ ctf_render_header('compute', 'Compute Engine');
                         <strong>ctf-web-app</strong>
                     </div>
                 </td>
-                <td>us-central1-a</td>
+                <td>ibague-1a</td>
                 <td><span class="gc-chip gc-chip-ok">RUNNING</span></td>
                 <td><code>web_app</code></td>
                 <td><code>80/tcp</code></td>

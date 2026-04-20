@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // VULNERABILIDAD INTENCIONAL (SQLi) - concatenacion directa de entrada del usuario.
         // NO usar este patron en produccion. Solo con fines educativos.
-        $query = "SELECT id, username FROM users WHERE username = '" . $user . "' AND password = '" . $pass . "'";
+        $query = "SELECT id, username, role FROM users WHERE username = '" . $user . "' AND password = '" . $pass . "'";
 
         $result = @$mysqli->query($query);
 
@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
                 $_SESSION['ctf_user'] = $row['username'];
+                $_SESSION['ctf_role'] = isset($row['role']) ? $row['role'] : 'user';
                 $_SESSION['ctf_logged_at'] = date('c');
                 $_SESSION['ctf_bypass'] = true;
                 $mysqli->close();
@@ -50,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CTF Cloud Console - Sign in</title>
+    <title>Ibague Data Services - Iniciar sesion</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&family=Roboto+Mono&display=swap" rel="stylesheet" />
@@ -62,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="gc-appbar-inner">
             <div class="gc-appbar-brand">
                 <span class="material-icons gc-appbar-logo">cloud</span>
-                <span class="gc-appbar-title">CTF Cloud Console</span>
+                <span class="gc-appbar-title">Ibague Data Services</span>
+                <span class="gc-appbar-subtitle">IDS</span>
             </div>
             <div class="gc-appbar-actions">
                 <span class="material-icons gc-appbar-icon" title="Ayuda">help_outline</span>
@@ -78,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="material-icons gc-card-icon">lock</span>
                 <div>
                     <h1 class="gc-title">Inicia sesion</h1>
-                    <p class="gc-subtitle">Accede a tu consola CTF para administrar recursos.</p>
+                    <p class="gc-subtitle">Accede a tu consola IDS para administrar recursos.</p>
                 </div>
             </div>
 

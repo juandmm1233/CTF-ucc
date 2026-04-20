@@ -1,7 +1,6 @@
 <?php
 /**
- * Conexion estandar usada por el servidor web (solo SELECT).
- * Credenciales cargadas desde variables de entorno para no hardcodearlas.
+ * Conexion estandar usada por web_app (solo SELECT).
  */
 function ctf_db_connect() {
     $db_host = getenv('DB_HOST') ?: 'db_ssh';
@@ -19,9 +18,9 @@ function ctf_db_connect() {
 }
 
 /**
- * Conexion privilegiada usada por /admin.php para crear o modificar
- * usuarios. Esta cuenta tiene ALL PRIVILEGES sobre ctf_login y permiso
- * CREATE USER global. Nunca debe usarse desde endpoints publicos.
+ * Conexion privilegiada usada por /admin.php para provisionar nuevos
+ * usuarios (PHP + MariaDB). Tiene ALL PRIVILEGES sobre ctf_login y
+ * CREATE USER global. No exponer en endpoints publicos.
  */
 function ctf_db_connect_admin() {
     $db_host  = getenv('DB_HOST')       ?: 'db_ssh';
