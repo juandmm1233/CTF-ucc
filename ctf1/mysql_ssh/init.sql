@@ -28,9 +28,17 @@ CREATE TABLE IF NOT EXISTS secrets (
 );
 
 INSERT INTO secrets (label, value) VALUES
-    ('api_key_prod', 'AIzaSy-FAKE-KEY-DO-NOT-USE-0001'),
-    ('ssh_hint',     'Usuario: admin | Password: password123'),
-    ('flag_hint',    'La bandera real esta en /home/admin/flag.txt');
+    ('api_key_prod',     'AIzaSy-FAKE-KEY-DO-NOT-USE-0001'),
+    ('ssh_hint',         'Usuario: admin | Password: password123'),
+    ('flag_hint',        'La bandera real esta en /home/admin/flag.txt'),
+    -- Hashes MD5 dejados por un dev "para pruebas". Romperlos con john/hashcat
+    -- usando rockyou.txt revela la bandera de hash cracking.
+    ('legacy_md5_dev',   '5f4dcc3b5aa765d61d8327deb882cf99'), -- "password"
+    ('legacy_md5_op',    '21232f297a57a5a743894a0e4a801fc3'), -- "admin"
+    ('legacy_md5_qa',    'e10adc3949ba59abbe56e057f20f883e'), -- "123456"
+    ('hash_flag_hint',   'Cuando descifres los 3 hashes MD5, somete: FLAG{UCC_IDS_Hash_Cracked}'),
+    -- Honeypot: bandera trampa que NO debe enviarse al scoreboard.
+    ('honeypot_alert',   'FLAG{HONEYPOT_DO_NOT_SUBMIT_01}');
 
 -- Usuario MySQL utilizado por el servicio web_app para el login (solo lectura)
 CREATE USER IF NOT EXISTS 'ctf_web'@'%' IDENTIFIED BY 'ctf_web_pass';

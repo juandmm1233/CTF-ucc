@@ -1,0 +1,8 @@
+# No copiar secretos dentro de la imagen; se inyectan via env_file en runtime.
+secrets.env
+*.env
+.env
+.env.*
+__pycache__/
+*.pyc
+*.pyo

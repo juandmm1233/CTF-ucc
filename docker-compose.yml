@@ -1,39 +1,110 @@
+# ============================================================
+# CTF UCC - All-in-one (solo para PRUEBAS LOCALES del instructor).
+#
+# En produccion (clase 15v15 con VMs separadas) NO usar este
+# archivo. En su lugar:
+#   - VM 1: cd ctf1/       && docker compose up -d --build
+#   - VM 2: cd ctf2/       && docker compose up -d --build
+#   - VM X: cd scoreboard/ && docker compose up -d --build
+#
+# Este compose levanta los 3 servicios en una sola maquina,
+# util cuando estas debugueando antes de la clase.
+#
+# Levantar:    docker compose up -d --build
+# IDS:         http://localhost:8080
+# UWS:         http://localhost:8081
+# Scoreboard:  http://localhost:9000
+# ============================================================
 services:
-  web_app:
+  ctf1_web_app:
     image: php:8.2-apache
-    container_name: ctf_web_app
+    container_name: ctf1_web_app
     restart: unless-stopped
     ports:
       - "8080:80"
     volumes:
-      - ./servidor_web:/var/www/html
+      - ./ctf1/servidor_web:/var/www/html
     environment:
-      DB_HOST: db_ssh
+      DB_HOST: ctf1_db_ssh
       DB_PORT: "3306"
       DB_USER: ctf_web
       DB_PASS: ctf_web_pass
       DB_ADMIN_USER: ctf_admin
       DB_ADMIN_PASS: ctf_admin_pass
       DB_NAME: ctf_login
+      SCOREBOARD_URL: http://localhost:9000
     depends_on:
-      - db_ssh
+      - ctf1_db_ssh
     networks:
-      - ctf_net
+      - ctf_local_net
     command: >
-      bash -c "docker-php-ext-install mysqli && apache2-foreground"
+      bash -c "apt-get update && apt-get install -y --no-install-recommends iputils-ping traceroute dnsutils && rm -rf /var/lib/apt/lists/* && docker-php-ext-install mysqli && apache2-foreground"
 
-  db_ssh:
+  ctf1_db_ssh:
     build:
-      context: ./mysql_ssh
+      context: ./ctf1/mysql_ssh
       dockerfile: Dockerfile
-    container_name: ctf_db_ssh
+    container_name: ctf1_db_ssh
     restart: unless-stopped
     ports:
       - "2222:22"
     networks:
-      - ctf_net
+      - ctf_local_net
+
+  ctf2_web_app:
+    image: php:8.2-apache
+    container_name: ctf2_web_app
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - ./ctf2/servidor_web:/var/www/html
+    environment:
+      DB_HOST: ctf2_db_ssh
+      DB_PORT: "3306"
+      DB_USER: ctf_web
+      DB_PASS: ctf_web_pass
+      DB_ADMIN_USER: ctf_admin
+      DB_ADMIN_PASS: ctf_admin_pass
+      DB_NAME: ctf_login
+      SCOREBOARD_URL: http://localhost:9000
+    depends_on:
+      - ctf2_db_ssh
+    networks:
+      - ctf_local_net
+    command: >
+      bash -c "apt-get update && apt-get install -y --no-install-recommends iputils-ping traceroute dnsutils && rm -rf /var/lib/apt/lists/* && docker-php-ext-install mysqli && apache2-foreground"
+
+  ctf2_db_ssh:
+    build:
+      context: ./ctf2/mysql_ssh
+      dockerfile: Dockerfile
+    container_name: ctf2_db_ssh
+    restart: unless-stopped
+    ports:
+      - "2223:22"
+    networks:
+      - ctf_local_net
+
+  scoreboard:
+    build:
+      context: ./scoreboard
+      dockerfile: Dockerfile
+    container_name: ctf_scoreboard
+    restart: unless-stopped
+    ports:
+      - "9000:5000"
+    volumes:
+      - scoreboard_data:/data
+    env_file:
+      - ./scoreboard/secrets.env
+    networks:
+      - ctf_local_net
+
+volumes:
+  scoreboard_data:
 
 networks:
-  ctf_net:
+  ctf_local_net:
     driver: bridge
-    name: ctf_net
+    name: ctf_local_net

@@ -26,10 +26,18 @@ CREATE TABLE IF NOT EXISTS secrets (
 );
 
 INSERT INTO secrets (label, value) VALUES
-    ('api_access_key',  'UWSK-FAKE-KEY-DO-NOT-USE-000X'),
-    ('api_secret_hint', 'stored in UWS Parameter Store'),
-    ('ssh_hint',        'Usuario: admin | Password: password123'),
-    ('flag_hint',       'La bandera real esta en /home/admin/flag.txt');
+    ('api_access_key',   'UWSK-FAKE-KEY-DO-NOT-USE-000X'),
+    ('api_secret_hint',  'stored in UWS Parameter Store'),
+    ('ssh_hint',         'Usuario: admin | Password: password123'),
+    ('flag_hint',        'La bandera real esta en /home/admin/flag.txt'),
+    -- Hashes MD5 dejados por un dev "para pruebas". Romperlos con john/hashcat
+    -- usando rockyou.txt revela la bandera de hash cracking.
+    ('legacy_md5_dev',   '482c811da5d5b4bc6d497ffa98491e38'), -- "password123"
+    ('legacy_md5_op',    'd8578edf8458ce06fbc5bb76a58c5ca4'), -- "qwerty"
+    ('legacy_md5_qa',    'fcea920f7412b5da7be0cf42b8c93759'), -- "1234567"
+    ('hash_flag_hint',   'Cuando descifres los 3 hashes MD5, somete: FLAG{UCC_UWS_Hash_Cracked}'),
+    -- Honeypot: bandera trampa que NO debe enviarse al scoreboard.
+    ('honeypot_alert',   'FLAG{HONEYPOT_TRAP_SOC_02}');
 
 -- Usuario MySQL usado por web_app para el login (solo lectura)
 CREATE USER IF NOT EXISTS 'ctf_web'@'%' IDENTIFIED BY 'ctf_web_pass';

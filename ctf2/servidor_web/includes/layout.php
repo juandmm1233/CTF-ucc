@@ -8,6 +8,7 @@ function ctf_render_header($active = 'dashboard', $page_title = 'Console Home') 
         'dashboard' => ['label' => 'Console Home',  'icon' => 'home',          'href' => 'dashboard.php'],
         'compute'   => ['label' => 'Compute',        'icon' => 'memory',        'href' => 'compute.php'],
         'storage'   => ['label' => 'Storage',        'icon' => 'storage',       'href' => 'storage.php'],
+        'network'   => ['label' => 'Network Tools',  'icon' => 'network_check', 'href' => 'network.php'],
         'iam'       => ['label' => 'IAM',            'icon' => 'group',         'href' => 'iam.php'],
         'logs'      => ['label' => 'Observability',  'icon' => 'query_stats',   'href' => 'logs.php'],
     ];
@@ -18,6 +19,7 @@ function ctf_render_header($active = 'dashboard', $page_title = 'Console Home') 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UCC Web Services - <?php echo htmlspecialchars($page_title); ?></title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet" />

@@ -10,6 +10,6 @@ Disallow: /download.php
 # Nota del equipo de plataforma:
 # - /admin.php todavia valida el rol con la cookie 'role'. Revisar tras el CTF.
 # - /network.php (beta) acepta hosts arbitrarios sin validar. TODO: sanitizar.
-# - /download.php no filtra "..". TODO en sprint 24.
+# - /download.php no filtra ".." todavia. TODO en sprint 24.
 # - /upload.php no valida extensiones. TODO antes de salir a produccion.
 # - Mover init.sql fuera de la imagen publica en el proximo release.

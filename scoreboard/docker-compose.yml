@@ -1,0 +1,42 @@
+# ============================================================
+# CTF UCC - Scoreboard 15 vs 15
+# IMPORTANTE: este servicio debe correr SOLO EN UNA VM.
+# Si lo levantan dos veces, cada VM tendra su propio marcador
+# y los puntajes no se sincronizan.
+#
+# Recomendado: una "VM de instructor" o reusar la VM mas estable
+# (por ejemplo la que aloja CTF1).
+#
+# Levantar:    docker compose up -d --build
+# Acceso web:  http://<ip-vm-scoreboard>:9000
+# Configurar:  en cada VM de CTF, exportar la URL antes de
+#              levantar el lab para que aparezca el link en el
+#              dashboard, ej:
+#                export SCOREBOARD_URL=http://10.0.0.50:9000
+#                docker compose up -d --build
+# ============================================================
+services:
+  scoreboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ctf_scoreboard
+    restart: unless-stopped
+    ports:
+      - "9000:5000"
+    volumes:
+      - scoreboard_data:/data
+    # secrets.env inyecta SCOREBOARD_RESET_PASSWORD al contenedor
+    # (no se copia en la imagen, no se sirve por HTTP).
+    env_file:
+      - ./secrets.env
+    networks:
+      - ctf_scoreboard_net
+
+volumes:
+  scoreboard_data:
+
+networks:
+  ctf_scoreboard_net:
+    driver: bridge
+    name: ctf_scoreboard_net

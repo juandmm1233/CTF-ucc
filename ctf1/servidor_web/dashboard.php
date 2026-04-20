@@ -13,6 +13,19 @@ ctf_render_header('dashboard', 'Dashboard');
     </div>
 </div>
 
+<?php $sb = getenv('SCOREBOARD_URL'); if ($sb): ?>
+<div class="gc-alert" style="background:#e8f0fe;border-color:#c2d7fb;color:#174ea6;margin-bottom:24px;">
+    <span class="material-icons">emoji_events</span>
+    <div>
+        <strong>Scoreboard 15 vs 15</strong> activo en
+        <a href="<?php echo htmlspecialchars($sb); ?>" target="_blank" rel="noopener" style="color:#1a73e8;font-weight:500;">
+            <?php echo htmlspecialchars($sb); ?>
+        </a>.
+        Envia las banderas que encuentres con tu alias y equipo. Cuidado con los honeypots.
+    </div>
+</div>
+<?php endif; ?>
+
 <section class="gc-grid gc-grid-4">
     <div class="gc-metric-card">
         <span class="gc-metric-label">VMs activas</span>
@@ -125,9 +138,10 @@ ctf_render_header('dashboard', 'Dashboard');
         </div>
         <ul class="gc-list">
             <li><a href="compute.php"><span class="material-icons">dns</span> Inspecciona la VM <code>db_ssh</code></a></li>
-            <li><a href="storage.php"><span class="material-icons">folder</span> Revisa el bucket <code>ctf-ucc-backups</code></a></li>
+            <li><a href="storage.php"><span class="material-icons">folder</span> Revisa el bucket <code>ids-ucc-backups</code></a></li>
+            <li><a href="network.php"><span class="material-icons">network_check</span> Diagnostica la red interna</a></li>
             <li><a href="iam.php"><span class="material-icons">group</span> Audita los usuarios IAM</a></li>
-            <li><a href="logs.php"><span class="material-icons">receipt_long</span> Logs en vivo del cluster</a></li>
+            <li><a href="logs.php"><span class="material-icons">receipt_long</span> Logs en vivo de IDS Observability</a></li>
         </ul>
     </div>
 </section>

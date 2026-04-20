@@ -1,17 +1,17 @@
 # ============================================================
-# CTF UCC - Lab 2: UCC Web Services (UWS)
+# CTF UCC - Lab 1: Ibague Data Services (IDS)
 # Pensado para correr en una VM independiente (sin scoreboard).
 # Levantar con:  docker compose up -d --build
-# Acceso web:    http://<ip-vm>:8081
-# Acceso SSH:    ssh admin@<ip-vm> -p 2223   (password: password123)
+# Acceso web:    http://<ip-vm>:8080
+# Acceso SSH:    ssh admin@<ip-vm> -p 2222   (password: password123)
 # ============================================================
 services:
   web_app:
     image: php:8.2-apache
-    container_name: ctf2_web_app
+    container_name: ctf1_web_app
     restart: unless-stopped
     ports:
-      - "8081:80"
+      - "8080:80"
     volumes:
       - ./servidor_web:/var/www/html
     environment:
@@ -28,7 +28,7 @@ services:
     depends_on:
       - db_ssh
     networks:
-      - ctf_net2
+      - ctf1_net
     command: >
       bash -c "apt-get update && apt-get install -y --no-install-recommends iputils-ping traceroute dnsutils && rm -rf /var/lib/apt/lists/* && docker-php-ext-install mysqli && apache2-foreground"
 
@@ -36,14 +36,14 @@ services:
     build:
       context: ./mysql_ssh
       dockerfile: Dockerfile
-    container_name: ctf2_db_ssh
+    container_name: ctf1_db_ssh
     restart: unless-stopped
     ports:
-      - "2223:22"
+      - "2222:22"
     networks:
-      - ctf_net2
+      - ctf1_net
 
 networks:
-  ctf_net2:
+  ctf1_net:
     driver: bridge
-    name: ctf_net2
+    name: ctf1_net

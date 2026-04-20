@@ -276,6 +276,48 @@ html, body {
     border-left-color: var(--gc-danger);
 }
 
+.gc-alert-warn {
+    background: #fef7e0;
+    color: #b06000;
+    border-left-color: #b06000;
+}
+
+.gc-label {
+    display: block;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gc-text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+}
+
+.gc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.gc-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gc-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gc-list li:last-child { border-bottom: none; }
+
+.gc-list a {
+    color: var(--gc-link);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gc-list a:hover { text-decoration: underline; }
+
 /* ===== Panel de resultado ===== */
 .gc-panel {
     background: var(--gc-chip);
@@ -347,6 +389,8 @@ html, body {
 .gc-app {
     background: var(--gc-bg);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .gc-chip-project {
@@ -406,7 +450,7 @@ html, body {
 .gc-shell {
     display: grid;
     grid-template-columns: 256px 1fr;
-    min-height: calc(100vh - 56px);
+    flex: 1 0 auto;
 }
 
 /* ===== Sidebar ===== */

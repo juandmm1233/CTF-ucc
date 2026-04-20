@@ -8,6 +8,7 @@ function ctf_render_header($active = 'dashboard', $page_title = 'Dashboard') {
         'dashboard' => ['label' => 'Dashboard',       'icon' => 'dashboard',     'href' => 'dashboard.php'],
         'compute'   => ['label' => 'Compute',         'icon' => 'dns',           'href' => 'compute.php'],
         'storage'   => ['label' => 'Storage',         'icon' => 'folder',        'href' => 'storage.php'],
+        'network'   => ['label' => 'Network Tools',   'icon' => 'network_check', 'href' => 'network.php'],
         'iam'       => ['label' => 'IAM & Admin',     'icon' => 'group',         'href' => 'iam.php'],
         'logs'      => ['label' => 'Observability',   'icon' => 'receipt_long',  'href' => 'logs.php'],
     ];
@@ -18,6 +19,7 @@ function ctf_render_header($active = 'dashboard', $page_title = 'Dashboard') {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ibague Data Services - <?php echo htmlspecialchars($page_title); ?></title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&family=Roboto+Mono&display=swap" rel="stylesheet" />

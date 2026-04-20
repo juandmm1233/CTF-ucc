@@ -246,10 +246,30 @@ a { color: var(--uws-link); }
 }
 .uws-alert-error .material-icons { color: var(--uws-danger); }
 
+.uws-alert-warn {
+    background: var(--uws-warn-bg);
+    color: var(--uws-text);
+    border-color: #f2d8a4;
+}
+.uws-alert-warn .material-icons { color: var(--uws-warn); }
+
+.uws-label {
+    display: block;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--uws-text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+}
+
 /* ===== App shell ===== */
 .uws-app {
     background: var(--uws-bg);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ===== Top bar ===== */
@@ -433,7 +453,7 @@ a { color: var(--uws-link); }
 .uws-shell {
     display: grid;
     grid-template-columns: 240px 1fr;
-    min-height: calc(100vh - 72px);
+    flex: 1 0 auto;
 }
 
 /* ===== Sidebar ===== */
@@ -856,6 +876,7 @@ code {
     align-items: center;
     justify-content: space-between;
     border-top: 3px solid var(--uws-orange);
+    flex-shrink: 0;
 }
 
 .uws-footer-links {

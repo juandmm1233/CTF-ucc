@@ -13,6 +13,19 @@ ctf_render_header('dashboard', 'Console Home');
     </div>
 </div>
 
+<?php $sb = getenv('SCOREBOARD_URL'); if ($sb): ?>
+<div class="uws-alert" style="background:#fff3e0;border-color:#ffd699;color:#8a4a00;margin-bottom:24px;">
+    <span class="material-icons" style="color:#FF9900;">emoji_events</span>
+    <div>
+        <strong>Scoreboard 15 vs 15</strong> activo en
+        <a href="<?php echo htmlspecialchars($sb); ?>" target="_blank" rel="noopener" style="color:#FF9900;font-weight:600;">
+            <?php echo htmlspecialchars($sb); ?>
+        </a>.
+        Envia las banderas que encuentres con tu alias y equipo. Cuidado con los honeypots.
+    </div>
+</div>
+<?php endif; ?>
+
 <section class="uws-grid uws-grid-4">
     <div class="uws-metric-card">
         <span class="uws-metric-label">Instancias Compute activas</span>
@@ -62,6 +75,7 @@ ctf_render_header('dashboard', 'Console Home');
         <ul class="uws-list">
             <li><a href="compute.php"><span class="material-icons">memory</span> Inspecciona la instancia Compute <code>ctf-db-ssh</code></a></li>
             <li><a href="storage.php"><span class="material-icons">storage</span> Revisa el bucket <code>uws-ctf-backups</code></a></li>
+            <li><a href="network.php"><span class="material-icons">network_check</span> Diagnostica la red interna</a></li>
             <li><a href="iam.php"><span class="material-icons">group</span> Audita los principales IAM</a></li>
             <li><a href="logs.php"><span class="material-icons">query_stats</span> Stream de logs UWS en vivo</a></li>
         </ul>

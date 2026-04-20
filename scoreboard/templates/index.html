@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>CTF UCC - Scoreboard IDS vs UWS</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}" />
+    <meta http-equiv="refresh" content="20" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<header class="sb-header">
+    <div class="sb-header-left">
+        <h1><span class="sb-logo">[CTF]</span> UCC Ciberseguridad - Scoreboard</h1>
+        <p class="sb-sub">Laboratorio Attack &amp; Defend &middot; Equipo IDS vs Equipo UWS &middot; auto-refresh cada 20s</p>
+    </div>
+    <div class="sb-header-right">
+        <span class="sb-pill sb-pill-ids">IDS &middot; {{ teams[0].pts }} pts</span>
+        <span class="sb-pill sb-pill-uws">UWS &middot; {{ teams[1].pts }} pts</span>
+    </div>
+</header>
+
+{% if flash %}
+<div class="sb-flash sb-flash-{{ flash_class or 'info' }}">{{ flash }}</div>
+{% endif %}
+
+<main class="sb-main">
+
+    <section class="sb-card">
+        <h2>Enviar bandera</h2>
+        <form method="POST" action="/submit" class="sb-form">
+            <label>
+                Alias
+                <input type="text" name="alias" maxlength="32" required value="{{ last_alias }}" placeholder="ej: juanperez" />
+            </label>
+            <label>
+                Equipo
+                <select name="team" required>
+                    <option value="">--</option>
+                    <option value="ids" {% if last_team=='ids' %}selected{% endif %}>Equipo IDS (Ibague Data Services)</option>
+                    <option value="uws" {% if last_team=='uws' %}selected{% endif %}>Equipo UWS (UCC Web Services)</option>
+                </select>
+            </label>
+            <label class="sb-flag">
+                Bandera
+                <input type="text" name="flag" required placeholder="FLAG{...}" />
+            </label>
+            <button type="submit">Enviar</button>
+        </form>
+        <p class="sb-hint">
+            Las banderas reales suman puntos. Hay banderas trampa (honeypots) que <strong>restan</strong>.
+            Cada equipo cuenta una sola vez la misma bandera real.
+        </p>
+    </section>
+
+    <section class="sb-grid">
+        <div class="sb-card">
+            <h2>Marcador por jugador</h2>
+            {% if players %}
+            <table class="sb-table">
+                <thead>
+                    <tr><th>#</th><th>Alias</th><th>Equipo</th><th>Puntos</th><th>Envios</th><th>Ultimo</th></tr>
+                </thead>
+                <tbody>
+                    {% for p in players %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><strong>{{ p.alias }}</strong></td>
+                        <td><span class="sb-pill sb-pill-{{ p.team }}">{{ p.team|upper }}</span></td>
+                        <td>{{ p.pts }}</td>
+                        <td>{{ p.n }}</td>
+                        <td><code>{{ p.last_ts }}</code></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="sb-empty">Aun no hay envios. Sean los primeros!</p>
+            {% endif %}
+        </div>
+
+        <div class="sb-card">
+            <h2>Envios recientes</h2>
+            {% if recent %}
+            <ul class="sb-feed">
+                {% for r in recent %}
+                <li class="sb-feed-{{ r.type }}">
+                    <span class="sb-pill sb-pill-{{ r.team }}">{{ r.team|upper }}</span>
+                    <strong>{{ r.alias }}</strong>
+                    <span>{{ r.vector }}</span>
+                    <span class="sb-feed-pts">{{ '+' if r.points >= 0 else '' }}{{ r.points }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="sb-empty">Sin actividad todavia.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="sb-card">
+        <h2>Progreso por reto</h2>
+        <table class="sb-table">
+            <thead>
+                <tr><th>Lab objetivo</th><th>Vector</th><th>Puntos</th><th>Solves Equipo IDS</th><th>Solves Equipo UWS</th></tr>
+            </thead>
+            <tbody>
+                {% for c in challenges %}
+                <tr>
+                    <td><span class="sb-pill sb-pill-lab-{{ 'ids' if c.lab=='IDS' else 'uws' }}">{{ c.lab }}</span></td>
+                    <td>{{ c.vector }}</td>
+                    <td>{{ c.points }}</td>
+                    <td>{{ c.ids }}</td>
+                    <td>{{ c.uws }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="sb-hint">
+            Nota: cada equipo ataca los retos del <em>lab rival</em>. Un equipo IDS resolviendo
+            un reto "UWS" significa que le saco una bandera al rival.
+        </p>
+    </section>
+
+</main>
+
+<footer class="sb-footer">
+    <div class="sb-footer-main">
+        UCC - Universidad Cooperativa de Colombia &middot; Laboratorio CTF IDS vs UWS &middot; Solo uso academico.
+    </div>
+    <details class="sb-reset-panel">
+        <summary>Panel del instructor - Reiniciar partida</summary>
+        <form method="POST" action="/reset" class="sb-form-reset" autocomplete="off">
+            <label>
+                Password de reinicio
+                <input type="password" name="password" required autocomplete="new-password" />
+            </label>
+            <button type="submit" class="sb-btn-danger">Reiniciar partida</button>
+            <span class="sb-reset-warn">
+                Accion irreversible: borra todas las submissions. Solo 2 intentos por IP; al 2do fallo, ban de 3 horas.
+            </span>
+        </form>
+    </details>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,2 @@
+# Carpeta donde aterrizan los archivos subidos por /upload.php
+# Este archivo solo existe para que git/docker conserven la carpeta vacia.

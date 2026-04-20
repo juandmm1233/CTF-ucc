@@ -1,0 +1,5 @@
+# IDS Storage - Changelog publico
+2026-04-01  v1.2.0  Nuevo endpoint /network.php (beta) para diagnostico interno.
+2026-04-08  v1.2.1  Se agrega /download.php con preview de objetos del bucket.
+2026-04-15  v1.2.2  Subida de archivos por operadores (ver Storage > "Subir archivo").
+2026-04-19  v1.2.3  Banderas de prueba dispersas en notas internas (no distribuir).

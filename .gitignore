@@ -1,0 +1,22 @@
+# Secretos del scoreboard (password del panel de reinicio).
+scoreboard/secrets.env
+scoreboard/.env
+scoreboard/.env.*
+
+# Por convencion, nunca subir archivos .env
+.env
+*.local.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Docker volumes / runtime data
+scoreboard_data/
+
+# Editores / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
