@@ -1,7 +1,7 @@
 # CTF UCC — Indice rapido
 
 Bienvenido al laboratorio CTF de la Universidad Cooperativa de Colombia.
-Este repositorio contiene **dos labs vulnerables** (IDS y UWS) y un **scoreboard centralizado**, pensados para una clase de 30 estudiantes en formato **Equipo IDS (VM1) vs Equipo UWS (VM2)** durante 3 horas.
+Este repositorio contiene **dos servicios cloud vulnerables** (IDS y UWS) y un **scoreboard centralizado**, pensados para una clase de 30 estudiantes en formato **Equipo IDS (VM1) vs Equipo UWS (VM2)** durante 3 horas.
 
 ## Modelo del juego: Attack & Defend simultaneo
 
