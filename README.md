@@ -1,4 +1,4 @@
-# CTF UCC — Indice rapido Creado por juan diego martinez 
+# CTF UCC Demo ver 0.5
 
 Bienvenido al laboratorio CTF de la Universidad Cooperativa de Colombia sede Ibagué.
 Este repositorio contiene **dos servicios cloud vulnerables** (IDS y UWS) y un **scoreboard centralizado**, pensados para una clase de 30 estudiantes en formato **Equipo IDS (VM1) vs Equipo UWS (VM2)** durante 3 horas.
