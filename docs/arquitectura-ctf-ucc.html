@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arquitectura CTF UCC</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #171e27;
+      --elevated: #1e2630;
+      --text: #e8edf2;
+      --muted: #9aa8b5;
+      --faint: #6d7a86;
+      --line: #2a3540;
+      --accent: #3d8bfd;
+      --warn: #c9a227;
+      --warn-bg: #2a2410;
+      --info-bg: #13233a;
+      --ok: #3dd68c;
+      --font: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px 28px 80px;
+    }
+
+    h1 { font-size: 32px; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.02em; }
+    h2 { font-size: 20px; font-weight: 650; margin: 40px 0 12px; }
+    h3 { font-size: 16px; font-weight: 650; margin: 20px 0 8px; }
+    p { margin: 0 0 12px; color: var(--muted); }
+    p.lead { font-size: 16px; }
+    p.source { font-size: 12px; color: var(--faint); }
+
+    code {
+      font-family: Consolas, "Cascadia Code", monospace;
+      font-size: 0.92em;
+      background: var(--elevated);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 24px; }
+    .pill {
+      border: 1px solid var(--line);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 8px 0 24px;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 16px 18px;
+    }
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      font-weight: 650;
+      color: var(--text);
+    }
+    .stat span { font-size: 12px; color: var(--faint); }
+
+    .callout {
+      border: 1px solid var(--line);
+      background: var(--info-bg);
+      padding: 14px 16px;
+      margin: 16px 0 8px;
+    }
+    .callout.warn { background: var(--warn-bg); border-color: #4a3a12; }
+    .callout .title {
+      font-weight: 650;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .callout.warn .title { color: var(--warn); }
+    .callout p { margin: 0; }
+
+    .diagram-wrap {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 16px 8px 8px;
+      margin: 16px 0 8px;
+    }
+    .diagram-wrap svg { width: 100%; height: auto; display: block; }
+
+    .cards-3, .flow, .split {
+      display: grid;
+      gap: 12px;
+    }
+    .cards-3 { grid-template-columns: repeat(3, 1fr); }
+    .flow { grid-template-columns: repeat(4, 1fr); }
+    .split { grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .card-h {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .card-b { padding: 14px; }
+    .card-b p { font-size: 13px; margin-bottom: 8px; }
+    .card-b p.sub { color: var(--text); font-weight: 600; font-size: 14px; }
+    hr.div {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 10px 0;
+    }
+
+    .flow-box {
+      background: var(--elevated);
+      border: 1px solid var(--line);
+      padding: 12px;
+    }
+    .flow-box strong { display: block; margin-bottom: 6px; }
+    .flow-box p { font-size: 13px; margin: 0 0 4px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      color: var(--faint);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: none;
+    }
+    td { color: var(--text); }
+    .table-card { overflow: auto; }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: rgba(15, 20, 25, 0.94);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .toolbar small { color: var(--faint); }
+    .toolbar button {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      padding: 8px 14px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .stats, .cards-3, .flow, .split { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      .toolbar { display: none; }
+      body { background: #fff; color: #111; }
+      p, td, .stat span { color: #333; }
+      .page { max-width: none; padding: 0; }
+      .card, .stat, .diagram-wrap, .callout, .flow-box {
+        background: #fff;
+        border-color: #ccc;
+      }
+      h1, h2, h3, td, .stat strong, .card-h { color: #111; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <small>CTF UCC · presentacion de arquitectura</small>
+    <button type="button" onclick="window.print()">Imprimir / PDF</button>
+  </div>
+
+  <main class="page">
+    <h1>Arquitectura CTF UCC</h1>
+    <p class="lead">Laboratorio Attack &amp; Defend en Docker Compose: dos aplicaciones web PHP intencionalmente vulnerables y un tablero Flask independiente.</p>
+    <div class="pills">
+      <span class="pill active">Laboratorio educativo</span>
+      <span class="pill">Multi-contenedor</span>
+      <span class="pill">Attack &amp; Defend</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><strong>3</strong><span>Stacks Compose</span></div>
+      <div class="stat"><strong>5</strong><span>Contenedores all-in-one</span></div>
+      <div class="stat"><strong>2</strong><span>Equipos (IDS / UWS)</span></div>
+      <div class="stat"><strong>bridge</strong><span>Driver de red Docker</span></div>
+    </div>
+
+    <div class="callout">
+      <div class="title">Tipo de aplicacion</div>
+      <p>No es un producto de produccion. Es un CTF de aula: dos apps LAMP (Apache + PHP 8.2 + MariaDB) mas un marcador Flask + SQLite. El modelo de juego es Attack &amp; Defend simultaneo: cada equipo opera y defiende su VM mientras ataca la del rival.</p>
+    </div>
+
+    <h2>Como se conectan los servicios</h2>
+    <p>En pruebas locales el archivo raiz <code>docker-compose.yml</code> publica los tres stacks en una sola maquina, unidos por la red <code>ctf_local_net</code>. En clase, cada carpeta (<code>ctf1/</code>, <code>ctf2/</code>, <code>scoreboard/</code>) corre en su propia VM.</p>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 592 300" role="img" aria-label="Grafo de contenedores CTF UCC: host, dos labs PHP y scoreboard Flask">
+        <text x="296" y="12" text-anchor="middle" fill="#6d7a86" font-size="10">Publicacion de puertos (driver bridge)</text>
+        <line x1="296" y1="68" x2="100" y2="124" stroke="#9aa8b5" stroke-width="1.5"/>
+        <line x1="296" y1="68" x2="296" y2="124" stroke="#9aa8b5" stroke-width="1.5"/>
+        <line x1="296" y1="68" x2="492" y2="124" stroke="#9aa8b5" stroke-width="1.5"/>
+        <line x1="100" y1="176" x2="100" y2="232" stroke="#9aa8b5" stroke-width="1.5"/>
+        <line x1="296" y1="176" x2="296" y2="232" stroke="#9aa8b5" stroke-width="1.5"/>
+        <line x1="492" y1="176" x2="492" y2="232" stroke="#9aa8b5" stroke-width="1.5"/>
+        <rect x="212" y="16" width="168" height="52" rx="4" fill="#1e2630" stroke="#3d8bfd"/>
+        <text x="296" y="38" text-anchor="middle" fill="#e8edf2" font-size="12" font-weight="600">Host Docker</text>
+        <text x="296" y="54" text-anchor="middle" fill="#9aa8b5" font-size="10">compose all-in-one</text>
+        <rect x="16" y="124" width="168" height="52" rx="4" fill="#171e27" stroke="#2a3540"/>
+        <text x="100" y="146" text-anchor="middle" fill="#e8edf2" font-size="12" font-weight="600">IDS web</text>
+        <text x="100" y="162" text-anchor="middle" fill="#9aa8b5" font-size="10">:8080 Apache+PHP</text>
+        <rect x="212" y="124" width="168" height="52" rx="4" fill="#171e27" stroke="#2a3540"/>
+        <text x="296" y="146" text-anchor="middle" fill="#e8edf2" font-size="12" font-weight="600">UWS web</text>
+        <text x="296" y="162" text-anchor="middle" fill="#9aa8b5" font-size="10">:8081 Apache+PHP</text>
+        <rect x="408" y="124" width="168" height="52" rx="4" fill="#171e27" stroke="#2a3540"/>
+        <text x="492" y="146" text-anchor="middle" fill="#e8edf2" font-size="12" font-weight="600">Scoreboard</text>
+        <text x="492" y="162" text-anchor="middle" fill="#9aa8b5" font-size="10">:9000 Flask</text>
+        <rect x="16" y="232" width="168" height="52" rx="4" fill="#171e27" stroke="#2a3540"/>
+        <text x="100" y="254" text-anchor="middle" fill="#e8edf2" font-size="12" font-weight="600">IDS db+ssh</text>
+        <text x="100" y="270" text-anchor="middle" fill="#9aa8b5" font-size="10">:2222 MariaDB</text>
+        <rect x="212" y="232" width="168" height="52" rx="4" fill="#171e27" stroke="#2a3540"/>
+        <text x="296" y="254" text-anchor="middle" fill="#e8edf2" font-size="12" font-weight="600">UWS db+ssh</text>
+        <text x="296" y="270" text-anchor="middle" fill="#9aa8b5" font-size="10">:2223 MariaDB</text>
+        <rect x="408" y="232" width="168" height="52" rx="4" fill="#171e27" stroke="#2a3540"/>
+        <text x="492" y="254" text-anchor="middle" fill="#e8edf2" font-size="12" font-weight="600">SQLite</text>
+        <text x="492" y="270" text-anchor="middle" fill="#9aa8b5" font-size="10">volumen /data</text>
+      </svg>
+    </div>
+    <p class="source">Fuente: docker-compose.yml del repo · despliegue all-in-one del instructor</p>
+
+    <h2>Tres stacks, dos roles de equipo</h2>
+    <div class="cards-3">
+      <article class="card">
+        <div class="card-h">ctf1 — IDS <span class="pill">HTTP 8080 · SSH 2222</span></div>
+        <div class="card-b">
+          <p class="sub">Ibague Data Services</p>
+          <p>Equipo IDS defiende esta VM y ataca UWS</p>
+          <hr class="div" />
+          <p>Web: php:8.2-apache → ctf1_web_app</p>
+          <p>Datos: Ubuntu 22.04 + MariaDB + OpenSSH → ctf1_db_ssh</p>
+          <p>Red: ctf1_net (bridge) o ctf_local_net en all-in-one</p>
+          <p>MariaDB bind 0.0.0.0:3306 (solo red interna)</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-h">ctf2 — UWS <span class="pill">HTTP 8081 · SSH 2223</span></div>
+        <div class="card-b">
+          <p class="sub">UCC Web Services</p>
+          <p>Equipo UWS defiende esta VM y ataca IDS</p>
+          <hr class="div" />
+          <p>Web: php:8.2-apache → ctf2_web_app</p>
+          <p>Datos: Debian bookworm + MariaDB + OpenSSH + Supervisor → ctf2_db_ssh</p>
+          <p>Red: ctf2_net (bridge) o ctf_local_net en all-in-one</p>
+          <p>MariaDB bind 0.0.0.0:3306 (solo red interna)</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-h">scoreboard <span class="pill">HTTP 9000 → 5000</span></div>
+        <div class="card-b">
+          <p class="sub">Tablero central (una sola instancia)</p>
+          <p>Instructor / VM3 — no se ataca como lab</p>
+          <hr class="div" />
+          <p>Web: python:3.12-slim + Flask → ctf_scoreboard</p>
+          <p>Datos: SQLite en volumen scoreboard_data</p>
+          <p>Red: ctf_scoreboard_net (bridge) o ctf_local_net</p>
+          <p>sqlite3 en /data/scoreboard.db</p>
+        </div>
+      </article>
+    </div>
+
+    <h2>Flujo de una peticion</h2>
+    <div class="flow">
+      <div class="flow-box">
+        <strong>1. Navegador</strong>
+        <p>Estudiante abre :8080 o :8081</p>
+        <p>SSH opcional a :2222 / :2223</p>
+      </div>
+      <div class="flow-box">
+        <strong>2. Apache + PHP</strong>
+        <p>php:8.2-apache sirve /var/www/html</p>
+        <p>mysqli conecta a DB_HOST</p>
+      </div>
+      <div class="flow-box">
+        <strong>3. MariaDB interno</strong>
+        <p>3306 no se publica al host</p>
+        <p>init.sql crea users y secrets</p>
+      </div>
+      <div class="flow-box">
+        <strong>4. Scoreboard</strong>
+        <p>POST /submit con FLAG{...}</p>
+        <p>SQLite persiste puntajes</p>
+      </div>
+    </div>
+    <p>El banner del dashboard de cada lab lee <code>SCOREBOARD_URL</code>. Ese enlace es HTTP hacia el tablero; las bases MariaDB de IDS y UWS no se replican entre si. Por eso el scoreboard debe existir una sola vez en la red de clase.</p>
+
+    <h2>Drivers y conectores</h2>
+    <p>En este proyecto “driver” aparece en tres capas: el driver de red de Docker, el driver de volumen, y los conectores de aplicacion (mysqli y sqlite3).</p>
+    <div class="table-card card">
+      <table>
+        <thead>
+          <tr>
+            <th>Capa</th>
+            <th>Driver / conector</th>
+            <th>Donde</th>
+            <th>Para que</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Docker Network</td>
+            <td>bridge</td>
+            <td>ctf_local_net, ctf1_net, ctf2_net, ctf_scoreboard_net</td>
+            <td>DNS interno entre contenedores y NAT de puertos al host</td>
+          </tr>
+          <tr>
+            <td>Docker Volume</td>
+            <td>local (por defecto)</td>
+            <td>scoreboard_data → /data</td>
+            <td>Persistir scoreboard.db si se recrea el contenedor</td>
+          </tr>
+          <tr>
+            <td>PHP → MariaDB</td>
+            <td>mysqli (extensión C)</td>
+            <td>ctf1/servidor_web/includes/db.php y equivalente en ctf2</td>
+            <td>new mysqli(DB_HOST, user, pass, db, 3306) sobre TCP</td>
+          </tr>
+          <tr>
+            <td>PHP runtime</td>
+            <td>docker-php-ext-install mysqli</td>
+            <td>command del servicio web_app</td>
+            <td>Instala el driver en la imagen php:8.2-apache al arrancar</td>
+          </tr>
+          <tr>
+            <td>Flask → SQLite</td>
+            <td>sqlite3 (stdlib Python)</td>
+            <td>scoreboard/app.py</td>
+            <td>Archivo /data/scoreboard.db, sin servidor de BD aparte</td>
+          </tr>
+          <tr>
+            <td>SSH</td>
+            <td>OpenSSH server</td>
+            <td>ctf1_db_ssh y ctf2_db_ssh</td>
+            <td>Vector de pivote; MariaDB no sale al host, SSH si</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="source">Fuente: docker-compose.yml, Dockerfiles de mysql_ssh y scoreboard, includes/db.php · estado actual del repo</p>
+
+    <div class="callout warn">
+      <div class="title">MariaDB no usa un driver publicado al host</div>
+      <p>El puerto 3306 queda en la red bridge interna. Desde el navegador no se llega a MySQL. PHP resuelve <code>ctf1_db_ssh</code> / <code>ctf2_db_ssh</code> (all-in-one) o <code>db_ssh</code> (compose por VM) via el DNS embebido de Docker.</p>
+    </div>
+
+    <h3>Por que bridge y no overlay</h3>
+    <p><code>driver: bridge</code> es el driver de red por defecto de un Compose en una sola maquina. Crea un switch virtual, asigna IP a cada contenedor y publica puertos con iptables/NAT. Overlay se usaria en Swarm/Kubernetes multi-nodo; este lab no lo necesita. El volumen <code>scoreboard_data</code> usa el driver local del daemon Docker.</p>
+
+    <h2>Clasificacion de la aplicacion</h2>
+    <div class="split">
+      <div>
+        <h3>Lo que es</h3>
+        <p>CTF Attack &amp; Defend containerizado. Cada lab es una aplicacion web clasica (no SPA): PHP renderiza HTML en el servidor, sesion por cookie, MariaDB para usuarios y secretos. El scoreboard es una app Flask MVC minima (plantillas Jinja + POST de banderas).</p>
+        <p>Arquitectura de despliegue: tres Compose independientes, pensados para 1 VM por equipo mas 1 VM de instructor. El all-in-one replica eso en localhost para debug.</p>
+      </div>
+      <div>
+        <h3>Lo que no es</h3>
+        <p>No es microservicios de negocio, ni API gateway, ni cluster Swarm. No hay autenticacion fuerte en el tablero, ni rate limit de produccion, ni TLS. El codigo web esta disenado para ser vulnerable (SQLi, LFI, RCE, etc.) con fines de clase.</p>
+        <p>IDS y UWS son clones funcionales con distinta identidad visual y distinta imagen de sistema para el contenedor db+ssh (Ubuntu vs Debian+Supervisor).</p>
+      </div>
+    </div>
+
+    <article class="card">
+      <div class="card-h">Contrato de puertos en all-in-one</div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Destino</th>
+              <th>Host</th>
+              <th>Dentro del contenedor</th>
+              <th>Protocolo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>IDS web</td><td>localhost:8080</td><td>80</td><td>HTTP Apache</td></tr>
+            <tr><td>IDS SSH</td><td>localhost:2222</td><td>22</td><td>SSH</td></tr>
+            <tr><td>UWS web</td><td>localhost:8081</td><td>80</td><td>HTTP Apache</td></tr>
+            <tr><td>UWS SSH</td><td>localhost:2223</td><td>22</td><td>SSH</td></tr>
+            <tr><td>Scoreboard</td><td>localhost:9000</td><td>5000</td><td>HTTP Flask</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <h2>Restart y persistencia</h2>
+    <p>Todos los servicios usan <code>restart: unless-stopped</code>. El codigo PHP se monta por bind mount (<code>./ctf1/servidor_web</code> y <code>./ctf2/servidor_web</code>), asi que un parche en el host se refleja sin rebuild. El scoreboard copia el codigo en la imagen y persiste solo SQLite. Las bases MariaDB viven en el filesystem del contenedor db_ssh: <code>docker compose down -v</code> las borra.</p>
+  </main>
+</body>
+</html>

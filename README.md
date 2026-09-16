@@ -3,6 +3,12 @@
 Bienvenido al laboratorio CTF de la Universidad Cooperativa de Colombia sede Ibagué.
 Este repositorio contiene **dos servicios cloud vulnerables** (IDS y UWS) y un **scoreboard centralizado**, pensados para una clase de 30 estudiantes en formato **Equipo IDS (VM1) vs Equipo UWS (VM2)** durante 3 horas.
 
+## Documentación (auditoría y transferencia)
+
+Caso de estudio, arquitectura y tecnologías usadas: [`docs/DOCUMENTACION.md`](docs/DOCUMENTACION.md). Índice completo: [`docs/README.md`](docs/README.md). Presentación visual: [`docs/arquitectura-ctf-ucc.html`](docs/arquitectura-ctf-ucc.html).
+
+Este laboratorio se entrega **junto** con la plataforma de entrenamiento previo en `D:\juandmm1233\preCTF` (documentación espejo: `preCTF/docs/DOCUMENTACION.md`).
+
 ## Modelo del juego: Attack & Defend simultaneo
 
 A diferencia de un Red vs Blue tradicional, **cada equipo es full-stack**: opera y defiende
@@ -40,6 +46,7 @@ A diferencia de un Red vs Blue tradicional, **cada equipo es full-stack**: opera
 
 | Quien sos                  | Que leer                                           |
 |----------------------------|----------------------------------------------------|
+| Auditor / mantenedor       | [`docs/DOCUMENTACION.md`](docs/DOCUMENTACION.md) — caso de estudio, arquitectura y tecnologías |
 | Instructor / encargado     | [`README_INSTRUCTOR.md`](README_INSTRUCTOR.md) — manual completo (despliegue, banderas, mitigaciones, scoreboard) |
 | Estudiante del Equipo IDS  | [`ctf1/README.md`](ctf1/README.md) — manual unico del Equipo IDS (defensa IDS + ataque UWS) |
 | Estudiante del Equipo UWS  | [`ctf2/README.md`](ctf2/README.md) — manual unico del Equipo UWS (defensa UWS + ataque IDS) |
@@ -68,6 +75,9 @@ A diferencia de un Red vs Blue tradicional, **cada equipo es full-stack**: opera
 ├── README.md                  ← este indice
 ├── README_INSTRUCTOR.md       ← manual completo del lab (instructor)
 ├── docs/
+│   ├── README.md              ← índice de documentación
+│   ├── DOCUMENTACION.md       ← caso de estudio, arquitectura y tecnologías
+│   ├── arquitectura-ctf-ucc.html
 │   ├── RED_TEAM_PLAYBOOK.md   ← referencia tecnica ofensiva (detalle por vector)
 │   ├── BLUE_TEAM_PLAYBOOK.md  ← referencia tecnica defensiva (detalle por vector)
 │   └── csrf_demo/             ← template HTML para el vector CSRF

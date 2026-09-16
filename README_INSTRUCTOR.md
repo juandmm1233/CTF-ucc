@@ -4,6 +4,11 @@ Laboratorio vulnerable construido con Docker Compose para entrenar **Red Team
 vs Blue Team** en grupos grandes (probado con clases de 30 estudiantes, 15 vs 15).
 Disenado con fines **estrictamente educativos**.
 
+> **Auditoría / arquitectura:** caso de estudio, vista de componentes y stack
+> tecnológico en [`docs/DOCUMENTACION.md`](docs/DOCUMENTACION.md). Este manual
+> sigue siendo la guía operativa (despliegue, banderas, mitigaciones).
+> El entrenamiento previo a la clase está en el repositorio hermano **preCTF**.
+
 ## Edicion 15 vs 15: 2 labs + scoreboard + 8 vectores por lab
 
 Cada lab esta pensado para correr en una **VM independiente** dentro de la
@@ -98,6 +103,9 @@ CTF ucc/
 │   ├── templates/index.html
 │   └── static/{style.css,favicon.svg}
 └── docs/
+    ├── README.md
+    ├── DOCUMENTACION.md        Caso de estudio, arquitectura, tecnologías
+    ├── arquitectura-ctf-ucc.html
     ├── RED_TEAM_PLAYBOOK.md
     ├── BLUE_TEAM_PLAYBOOK.md
     └── csrf_demo/attacker.html
