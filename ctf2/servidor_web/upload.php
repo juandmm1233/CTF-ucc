@@ -45,6 +45,7 @@ ctf_render_header('storage', 'UWS Storage - Subir archivo');
     <p style="color:#5f6368;margin:0 0 16px 0;">
         Sube un objeto al bucket <code>uws-ctf-backups</code>. Operadores autorizados
         pueden subir respaldos comprimidos, scripts auxiliares y notas internas.
+        Nota interna del bucket: <code>/var/ctf-private/upload_flag.txt</code>
     </p>
     <form method="POST" action="upload.php" enctype="multipart/form-data" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
         <div style="flex:1;min-width:280px;">

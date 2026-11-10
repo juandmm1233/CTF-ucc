@@ -41,14 +41,24 @@ else
     echo "[entrypoint] Base de datos ya estaba inicializada, se omite init.sql."
 fi
 
-# --- 6) Crear la bandera en /home/admin/flag.txt ---
+# --- 6) Bandera SSH. El contenedor web escribe /lab_runtime/flag.txt ---
 FLAG_PATH="/home/admin/flag.txt"
 if [ ! -f "${FLAG_PATH}" ]; then
-    echo "FLAG{UCC_Ciber_Atrapada}" > "${FLAG_PATH}"
+    echo "PENDIENTE" > "${FLAG_PATH}"
     chown admin:admin "${FLAG_PATH}"
     chmod 640 "${FLAG_PATH}"
-    echo "[entrypoint] Bandera depositada en ${FLAG_PATH}."
+    echo "[entrypoint] Marcador inicial en ${FLAG_PATH}."
 fi
+(
+    while true; do
+        if [ -f /lab_runtime/flag.txt ]; then
+            cp /lab_runtime/flag.txt "${FLAG_PATH}"
+            chown admin:admin "${FLAG_PATH}"
+            chmod 640 "${FLAG_PATH}"
+        fi
+        sleep 3
+    done
+) &
 
 # --- 7) Generar host keys de SSH si no existen ---
 ssh-keygen -A >/dev/null 2>&1 || true

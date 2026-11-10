@@ -40,10 +40,10 @@ if [ ! -f "${INIT_FLAG}" ]; then
 fi
 
 if [ ! -f "${FLAG_PATH}" ]; then
-    echo "FLAG{UCC_UWS_Pwned}" > "${FLAG_PATH}"
+    echo "PENDIENTE" > "${FLAG_PATH}"
     chown admin:admin "${FLAG_PATH}"
     chmod 640 "${FLAG_PATH}"
-    echo "[init] Bandera depositada en ${FLAG_PATH}."
+    echo "[init] Marcador inicial en ${FLAG_PATH}."
 fi
 
 echo "[init] Inicializacion completada. Supervisor arrancara mariadb y sshd."

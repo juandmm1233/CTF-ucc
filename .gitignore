@@ -1,4 +1,4 @@
-# Secretos del scoreboard (password del panel de reinicio).
+# Secretos del scoreboard (password del panel y token de sync).
 scoreboard/secrets.env
 scoreboard/.env
 scoreboard/.env.*
@@ -6,6 +6,10 @@ scoreboard/.env.*
 # Por convencion, nunca subir archivos .env
 .env
 *.local.env
+
+# Flags generadas en runtime por el sync de cada lab.
+ctf1/servidor_web/includes/flags.local.php
+ctf2/servidor_web/includes/flags.local.php
 
 # Python
 __pycache__/

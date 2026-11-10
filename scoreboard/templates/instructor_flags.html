@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Flags de la partida - instructor</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<header class="sb-header">
+    <div class="sb-header-left">
+        <h1><span class="sb-logo">[CTF]</span> Flags registradas</h1>
+        <p class="sb-sub">Generación {{ exercise.generation }} · estado {{ exercise.status }} · {{ exercise.last_event }}</p>
+    </div>
+</header>
+
+<main class="sb-main">
+    <section class="sb-card">
+        <h2>Solo instructor</h2>
+        <p class="sb-hint">Esta página no forma parte del tablero público. No la proyectes a la clase.</p>
+        {% if flags %}
+        <table class="sb-table">
+            <thead>
+                <tr><th>Lab</th><th>Vector</th><th>Tipo</th><th>Puntos</th><th>Flag</th></tr>
+            </thead>
+            <tbody>
+                {% for f in flags %}
+                <tr>
+                    <td>{{ f.lab }}</td>
+                    <td>{{ f.vector }}</td>
+                    <td>{{ f.type }}</td>
+                    <td>{{ f.points }}</td>
+                    <td><code>{{ f.flag }}</code></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="sb-empty">Todavía no hay flags. Inicia el ejercicio.</p>
+        {% endif %}
+        <p class="sb-hint"><a href="{{ url_for('index') }}">Volver al tablero</a></p>
+    </section>
+</main>
+</body>
+</html>

@@ -17,9 +17,9 @@ maquina (cualquiera de las dos VMs, o una tercera "VM del instructor").
 
 | Carpeta         | Componente                     | Puerto web | Puerto SSH | Bandera final                |
 |-----------------|--------------------------------|------------|------------|------------------------------|
-| `ctf1/`         | **Ibague Data Services (IDS)** | `8080`     | `2222`     | `FLAG{UCC_Ciber_Atrapada}`   |
-| `ctf2/`         | **UCC Web Services (UWS)**     | `8081`     | `2223`     | `FLAG{UCC_UWS_Pwned}`        |
-| `scoreboard/`   | Tablero Flask + SQLite         | `9000`     | -          | -                            |
+| `ctf1/`         | **Ibague Data Services (IDS)** | `8080`     | `2222`     | aleatoria, la registra el scoreboard |
+| `ctf2/`         | **UCC Web Services (UWS)**     | `8081`     | `2223`     | aleatoria, la registra el scoreboard |
+| `scoreboard/`   | Tablero Flask + SQLite en LXC  | `9000`     | -          | -                            |
 
 > **Por que un solo scoreboard?** Cada VM tiene su propia base de datos
 > SQLite local. Si levantas el scoreboard en las dos VMs, los puntajes
@@ -43,8 +43,9 @@ los parches uno a uno.
 | 7 | Hash cracking (MD5) | tabla `secrets` via SQLi UNION        | 100 | hashes etiquetados `legacy_md5_*`     |
 | 8 | SSH pivot           | `ssh admin@<ip> -p 2222/2223`         | 150 | credenciales en `/compute.php`        |
 
-Mas, **3 banderas trampa (honeypots)** que **restan 50 pts** si se envian al scoreboard
-(prefijo `FLAG{HONEYPOT_*}` o `FLAG{FAKE_*}`). Solo el instructor sabe cuales son.
+Mas, **3 banderas trampa (honeypots)** que **restan 50 pts** si se envian al scoreboard.
+Usan el mismo formato que una bandera real (`FLAG{345_gonasf_32v}`). No hay prefijo que las delate.
+Solo el instructor las ve, en el panel del scoreboard, despues de iniciar la partida.
 
 ### Para los estudiantes
 - Red Team: ver [`docs/RED_TEAM_PLAYBOOK.md`](docs/RED_TEAM_PLAYBOOK.md).
@@ -119,8 +120,8 @@ CTF ucc/
 
 ```bash
 cd ctf1
-# (opcional) URL publica del scoreboard, ej: http://10.0.0.50:9000
-export SCOREBOARD_URL=http://<IP-DE-LA-VM-DE-SCOREBOARD>:9000
+export SCOREBOARD_URL=http://<IP-DEL-LXC>:9000
+export LAB_SYNC_TOKEN=<el mismo valor que en el LXC>
 docker compose up -d --build
 ```
 
@@ -130,24 +131,44 @@ Listo en `http://<IP-VM1>:8080` y `ssh admin@<IP-VM1> -p 2222` (`password123`).
 
 ```bash
 cd ctf2
-export SCOREBOARD_URL=http://<IP-DE-LA-VM-DE-SCOREBOARD>:9000
+export SCOREBOARD_URL=http://<IP-DEL-LXC>:9000
+export LAB_SYNC_TOKEN=<el mismo valor que en el LXC>
 docker compose up -d --build
 ```
 
 Listo en `http://<IP-VM2>:8081` y `ssh admin@<IP-VM2> -p 2223`.
 
-### Paso 3 - VM del scoreboard (SOLO UNA)
+### Paso 3 - LXC del scoreboard (SOLO UNO)
 
-Puede ser la misma VM1, la VM2, o una tercera. Lo importante es que sea **una sola**:
+El tablero vive en un contenedor LXC, no en las VMs de los labs. En Proxmox
+hay que activar **nesting** para que ese LXC pueda correr Docker.
 
 ```bash
 cd scoreboard
+cp secrets.env.example secrets.env
+# Editar SCOREBOARD_RESET_PASSWORD y LAB_SYNC_TOKEN
 docker compose up -d --build
 ```
 
-Listo en `http://<IP-SCOREBOARD>:9000`. Esa misma URL es la que cada VM debe
-exportar en `SCOREBOARD_URL` para que aparezca el banner con el link en los
-dashboards.
+Listo en `http://<IP-DEL-LXC>:9000`. Esa URL es `SCOREBOARD_URL` en cada VM.
+`LAB_SYNC_TOKEN` tiene que ser el mismo valor en el LXC y en las dos VMs.
+
+### Control de la partida
+
+En el pie del tablero, panel del instructor (la contraseña es
+`SCOREBOARD_RESET_PASSWORD`):
+
+- **Iniciar** desde cero genera flags `FLAG{xxx_xxxxxx_xxx}` y abre los envíos.
+  Si la partida estaba detenida, reanuda el mismo juego.
+- **Parar** cierra los envíos y muestra «El ejercicio está detenido» en las
+  estaciones. Las flags no cambian.
+- **Reiniciar** borra el marcador, registra flags nuevas y las estaciones
+  muestran «El ejercicio fue reiniciado» hasta que el estudiante continúa.
+- **Ver flags** abre una página aparte con los valores. No queda en el HTML
+  público del tablero.
+
+Hasta el primer inicio, los labs muestran `PENDIENTE` y una pantalla de
+«El ejercicio aún no inicia». Las VMs no se apagan desde el tablero.
 
 ### Detener y limpiar (en cada VM por separado)
 
@@ -162,11 +183,15 @@ docker compose down -v
 Si quieres levantar IDS + UWS + scoreboard en una sola maquina (debug pre-clase):
 
 ```bash
+cp scoreboard/secrets.env.example scoreboard/secrets.env
 docker compose up -d --build
 # IDS:        http://localhost:8080
 # UWS:        http://localhost:8081
 # Scoreboard: http://localhost:9000
 ```
+
+Los contenedores de los labs usan `http://scoreboard:5000` por la red interna.
+`LAB_SYNC_TOKEN` sale de `scoreboard/secrets.env`.
 
 > Este `docker-compose.yml` raiz **no debe usarse en clase** (queda todo en
 > una sola maquina y no aprovecha la red Red vs Blue). Solo sirve para
@@ -186,14 +211,14 @@ docker compose up -d --build
    - En `Cloud Logging` hay una linea `DEBUG ... legacy cookie 'role' still honored`.
 5. **Cookie tampering** para la bandera intermedia:
    - DevTools -> Application -> Cookies -> anadir `role=admin`.
-   - Recargar `/admin.php` -> `FLAG{UCC_Cookie_Bypass_OK}`.
+   - Recargar `/admin.php` -> la bandera aleatoria de ese vector.
 6. **Pivot por SSH** para la bandera final:
 
 ```bash
 ssh admin@localhost -p 2222
 # contrasena: password123
 cat /home/admin/flag.txt
-# FLAG{UCC_Ciber_Atrapada}
+# bandera aleatoria registrada en el scoreboard al iniciar la partida
 ```
 
 ---
@@ -469,23 +494,14 @@ Archivo: `[ctf1/mysql_ssh/Dockerfile](ctf1/mysql_ssh/Dockerfile)`.
 
 ---
 
-### 5. Rotar la bandera
+### 5. Rotar las banderas
 
-`[ctf1/mysql_ssh/entrypoint.sh](ctf1/mysql_ssh/entrypoint.sh)` escribe la bandera al arrancar:
+Las flags ya no están fijas en el código. Al pulsar **Reiniciar** en el
+scoreboard se borra el marcador y se registra otro juego aleatorio. Cada lab,
+ya encendido, lo descarga y lo escribe en sus superficies (notas, `app.ini`,
+tabla `secrets`, archivos privados y `/home/admin/flag.txt`).
 
-```bash
-echo "FLAG{UCC_Ciber_Atrapada}" > "${FLAG_PATH}"
-```
-
-1. Cambiar el literal por una bandera nueva (por ej. `FLAG{UCC_Blue_Win_2026}`).
-2. Ajustar permisos si quieres que solo root pueda leerla:
-
-   ```bash
-   chown root:root "${FLAG_PATH}"
-   chmod 600 "${FLAG_PATH}"
-   ```
-
-3. Reconstruir: `docker compose up --build -d db_ssh`.
+No hace falta reconstruir las imágenes para cambiar las banderas.
 
 ---
 

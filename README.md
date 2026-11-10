@@ -18,7 +18,7 @@ A diferencia de un Red vs Blue tradicional, **cada equipo es full-stack**: opera
 |------------|----------------------|------------------------------|------------|---------|
 | Equipo IDS | VM1 — IDS            | VM2 — UWS (`<IP-VM2>:8081`)  | `8080`     | `2222`  |
 | Equipo UWS | VM2 — UWS            | VM1 — IDS (`<IP-VM1>:8080`)  | `8081`     | `2223`  |
-| —          | Scoreboard (VM3)     | —                            | `9000`     | —       |
+| —          | Scoreboard (LXC)     | —                            | `9000`     | —       |
 
 > En el scoreboard, el campo `team` espera los valores `ids` o `uws` (minusculas).
 
@@ -33,7 +33,7 @@ A diferencia de un Red vs Blue tradicional, **cada equipo es full-stack**: opera
 | Concepto                                                | Efecto       |
 |---------------------------------------------------------|--------------|
 | Cada bandera real del rival enviada                     | +50 a +150   |
-| Bandera honeypot enviada (`FLAG{HONEYPOT_*}` / `FLAG{FAKE_*}`) | -50    |
+| Bandera honeypot enviada (mismo formato que una real) | -50    |
 | Reportar honeypot al instructor sin enviarlo            | +25          |
 | Sin downtime las 3 horas                                | +100 al cierre |
 | Cada 5 min consecutivos de downtime                     | -25          |
@@ -91,7 +91,7 @@ A diferencia de un Red vs Blue tradicional, **cada equipo es full-stack**: opera
 │   ├── docker-compose.yml
 │   ├── servidor_web/
 │   └── mysql_ssh/
-├── scoreboard/                ← Scoreboard (VM3, una sola instancia en la red)
+├── scoreboard/                ← Scoreboard (un solo LXC en la red)
 │   ├── docker-compose.yml
 │   ├── app.py
 │   └── ...
@@ -102,9 +102,9 @@ A diferencia de un Red vs Blue tradicional, **cada equipo es full-stack**: opera
 
 ## Notas operativas
 
-- **Scoreboard:** debe haber **UNA sola instancia** en la red de clase (VM3).
-  Antes de levantar cada lab, exportar `SCOREBOARD_URL=http://<IP-SCOREBOARD>:9000`
-  para que el dashboard del lab muestre el banner con el link.
+- **Scoreboard:** debe haber **UNA sola instancia**, en el LXC del instructor.
+  Antes de levantar cada lab, exportar `SCOREBOARD_URL=http://<IP-LXC>:9000` y
+  `LAB_SYNC_TOKEN` (el mismo valor que en `scoreboard/secrets.env`).
 - **Health check de servicios:** el instructor monitorea HTTP 200 sobre `/` de cada VM
   cada 30s (recomendado: `watch -n 30 "curl -sI http://<IP-VM>:<PORT> | head -n1"`).
   Acumulado >10 min de fallos = knock-out.

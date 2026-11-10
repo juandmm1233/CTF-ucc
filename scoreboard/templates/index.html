@@ -19,6 +19,16 @@
     </div>
 </header>
 
+{% if exercise.status == 'pending' %}
+<div class="sb-status sb-status-pending">El ejercicio aún no inicia</div>
+{% elif exercise.status == 'stopped' %}
+<div class="sb-status sb-status-stopped">El ejercicio está detenido</div>
+{% elif exercise.last_event == 'restarted' %}
+<div class="sb-status sb-status-restarted">El ejercicio fue reiniciado</div>
+{% else %}
+<div class="sb-status sb-status-running">El ejercicio está en curso</div>
+{% endif %}
+
 {% if flash %}
 <div class="sb-flash sb-flash-{{ flash_class or 'info' }}">{{ flash }}</div>
 {% endif %}
@@ -30,11 +40,11 @@
         <form method="POST" action="/submit" class="sb-form">
             <label>
                 Alias
-                <input type="text" name="alias" maxlength="32" required value="{{ last_alias }}" placeholder="ej: juanperez" />
+                <input type="text" name="alias" maxlength="32" {% if exercise.status == 'running' %}required{% endif %} {% if exercise.status != 'running' %}disabled{% endif %} value="{{ last_alias }}" placeholder="ej: juanperez" />
             </label>
             <label>
                 Equipo
-                <select name="team" required>
+                <select name="team" {% if exercise.status == 'running' %}required{% endif %} {% if exercise.status != 'running' %}disabled{% endif %}>
                     <option value="">--</option>
                     <option value="ids" {% if last_team=='ids' %}selected{% endif %}>Equipo IDS (Ibague Data Services)</option>
                     <option value="uws" {% if last_team=='uws' %}selected{% endif %}>Equipo UWS (UCC Web Services)</option>
@@ -42,12 +52,12 @@
             </label>
             <label class="sb-flag">
                 Bandera
-                <input type="text" name="flag" required placeholder="FLAG{...}" />
+                <input type="text" name="flag" {% if exercise.status == 'running' %}required{% endif %} {% if exercise.status != 'running' %}disabled{% endif %} placeholder="FLAG{...}" />
             </label>
-            <button type="submit">Enviar</button>
+            <button type="submit" {% if exercise.status != 'running' %}disabled{% endif %}>Enviar</button>
         </form>
         <p class="sb-hint">
-            Las banderas reales suman puntos. Hay banderas trampa (honeypots) que <strong>restan</strong>.
+            Las banderas reales suman puntos. Hay banderas trampa con el mismo formato que <strong>restan</strong>.
             Cada equipo cuenta una sola vez la misma bandera real.
         </p>
     </section>
@@ -128,15 +138,30 @@
         UCC - Universidad Cooperativa de Colombia &middot; Laboratorio CTF IDS vs UWS &middot; Solo uso academico.
     </div>
     <details class="sb-reset-panel">
-        <summary>Panel del instructor - Reiniciar partida</summary>
-        <form method="POST" action="/reset" class="sb-form-reset" autocomplete="off">
+        <summary>Panel del instructor</summary>
+        <form method="POST" action="/exercise/control" class="sb-form-reset" autocomplete="off">
             <label>
-                Password de reinicio
+                Password de instructor
                 <input type="password" name="password" required autocomplete="new-password" />
             </label>
-            <button type="submit" class="sb-btn-danger">Reiniciar partida</button>
+            <div class="sb-control-actions">
+                <button type="submit" name="action" value="start" class="sb-btn-ok">Iniciar</button>
+                <button type="submit" name="action" value="stop" class="sb-btn-warn">Parar</button>
+                <button type="submit" name="action" value="restart" class="sb-btn-danger">Reiniciar</button>
+            </div>
             <span class="sb-reset-warn">
-                Accion irreversible: borra todas las submissions. Solo 2 intentos por IP; al 2do fallo, ban de 3 horas.
+                Iniciar desde cero registra flags nuevas. Parar conserva las flags y cierra los envíos.
+                Reiniciar borra el marcador y genera otro juego. Solo 2 intentos por IP; al 2do fallo, ban de 3 horas.
+            </span>
+        </form>
+        <form method="POST" action="/exercise/flags" class="sb-form-reset sb-form-flags" autocomplete="off">
+            <label>
+                Password para ver las flags
+                <input type="password" name="password" required autocomplete="new-password" />
+            </label>
+            <button type="submit" class="sb-btn-ok">Ver flags</button>
+            <span class="sb-reset-warn">
+                El listado sale en otra página y no se guarda en este tablero público.
             </span>
         </form>
     </details>

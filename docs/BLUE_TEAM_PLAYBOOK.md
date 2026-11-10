@@ -115,9 +115,8 @@ Tres mitigaciones combinables (idealmente todas):
   docker logs -f ctf2_web_app  # UWS
   ```
 - **MySQL audit**: queries sospechosas con `OR '1'='1`.
-- **Honeypot trap**: si el scoreboard registra que un equipo envio una bandera
-  `FLAG{HONEYPOT_*}`, eso significa que un atacante toco la tabla `secrets`
-  o leyo cookies sensibles. Avisen al instructor para puntos extra de Blue Team.
+- **Honeypot trap**: si el scoreboard avisa que una entrega fue trampa, un
+  atacante envió una bandera señuelo. Avisen al instructor para el punto extra.
 
 ## Reglas del juego para Blue Team
 - No pueden apagar Apache/MySQL/SSH (los servicios deben seguir respondiendo).

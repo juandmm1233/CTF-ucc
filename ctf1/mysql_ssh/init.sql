@@ -36,9 +36,11 @@ INSERT INTO secrets (label, value) VALUES
     ('legacy_md5_dev',   '5f4dcc3b5aa765d61d8327deb882cf99'), -- "password"
     ('legacy_md5_op',    '21232f297a57a5a743894a0e4a801fc3'), -- "admin"
     ('legacy_md5_qa',    'e10adc3949ba59abbe56e057f20f883e'), -- "123456"
-    ('hash_flag_hint',   'Cuando descifres los 3 hashes MD5, somete: FLAG{UCC_IDS_Hash_Cracked}'),
+    ('sqli_flag',        'PENDIENTE'),
+    ('hash_flag_hint',   'PENDIENTE'),
     -- Honeypot: bandera trampa que NO debe enviarse al scoreboard.
-    ('honeypot_alert',   'FLAG{HONEYPOT_DO_NOT_SUBMIT_01}');
+    -- Mismo formato que una bandera real; el valor lo escribe el scoreboard.
+    ('honeypot_alert',   'PENDIENTE');
 
 -- Usuario MySQL utilizado por el servicio web_app para el login (solo lectura)
 CREATE USER IF NOT EXISTS 'ctf_web'@'%' IDENTIFIED BY 'ctf_web_pass';

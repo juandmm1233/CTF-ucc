@@ -158,7 +158,11 @@ Roles aceptados: admin</pre>
         <div class="gc-card-subheader">
             <h2 class="gc-h2"><span class="material-icons">flag</span> Bandera intermedia</h2>
         </div>
-        <pre class="gc-code">FLAG{UCC_Cookie_Bypass_OK}</pre>
+        <pre class="gc-code"><?php
+            require_once __DIR__ . '/includes/exercise_lib.php';
+            $ctfFlags = ctf_local_flags();
+            echo htmlspecialchars(isset($ctfFlags['cookie']) ? $ctfFlags['cookie'] : 'PENDIENTE');
+        ?></pre>
         <p class="gc-hint">Aun queda la bandera final. Usa las credenciales SSH expuestas en
         <a href="compute.php">IDS Compute</a> y revisa <code>/home/admin/</code>.</p>
     </div>

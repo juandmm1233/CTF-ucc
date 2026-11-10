@@ -87,6 +87,27 @@ body {
 .sb-flash-danger  { border-left-color: var(--red);    background: rgba(239, 68, 68, 0.14); }
 .sb-flash-info    { border-left-color: var(--blue);   background: rgba(59, 130, 246, 0.12); }
 
+.sb-status {
+    margin: 16px 36px 0;
+    padding: 18px 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    border: 1px solid var(--border);
+}
+.sb-status-pending   { background: rgba(245, 158, 11, 0.16); color: var(--orange); }
+.sb-status-stopped   { background: rgba(239, 68, 68, 0.16);  color: var(--red); }
+.sb-status-restarted { background: rgba(59, 130, 246, 0.16); color: var(--blue); }
+.sb-status-running   { background: rgba(34, 197, 94, 0.14);  color: var(--green); }
+
+.sb-form button:disabled,
+.sb-form input:disabled,
+.sb-form select:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 .sb-main {
     padding: 24px 36px 60px;
     display: grid;
@@ -268,6 +289,30 @@ body {
     gap: 12px;
     align-items: end;
 }
+
+.sb-form-flags { margin-top: 16px; }
+
+.sb-control-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sb-btn-ok,
+.sb-btn-warn {
+    border: 0;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    color: white;
+}
+.sb-btn-ok { background: var(--green); }
+.sb-btn-warn { background: var(--orange); }
+.sb-btn-ok:hover,
+.sb-btn-warn:hover { filter: brightness(1.1); }
 
 .sb-form-reset label {
     display: flex;

@@ -60,7 +60,7 @@ A diferencia de un Red vs Blue tradicional (un equipo solo ataca y el otro solo 
 2. Obtener banderas del rival y/o más puntos al cierre (8 banderas reales por VM).
 3. Si el servicio propio cae más de **10 minutos consecutivos**: derrota por knock-out.
 
-Hay objetivos extra (uptime, informe técnico, explicación oral de parches, reporte de honeypots). Las banderas trampa (`FLAG{HONEYPOT_*}` / `FLAG{FAKE_*}`) restan puntos.
+Hay objetivos extra (uptime, informe técnico, explicación oral de parches, reporte de honeypots). Las banderas trampa usan el mismo formato aleatorio que las reales y restan puntos.
 
 ### 1.4 Relación con preCTF
 
@@ -74,7 +74,7 @@ preCTF (antes de la clase)
            ↓
 CTF UCC (día de la clase)
   Dos labs PHP vulnerables + scoreboard Flask
-  Mismos 8 vectores, flags FLAG{UCC_*} distintas
+  Mismos 8 vectores, flags aleatorias FLAG{xxx_xxxxxx_xxx} distintas de preCTF
   Attack & Defend 15 vs 15
 ```
 
@@ -150,7 +150,7 @@ flowchart TB
       D2["db_ssh\nDebian + Supervisor\nMariaDB + OpenSSH :2223"]
       W2 --> D2
     end
-    subgraph vm3["VM3 — Instructor"]
+    subgraph vm3["LXC — Instructor"]
       S["scoreboard\nFlask :9000 → 5000"]
       DB[(SQLite\n/data/scoreboard.db)]
       S --> DB
@@ -159,8 +159,8 @@ flowchart TB
   Estudiantes -->|HTTP / SSH| vm1
   Estudiantes -->|HTTP / SSH| vm2
   Estudiantes -->|POST /submit| vm3
-  W1 -.->|banner SCOREBOARD_URL| S
-  W2 -.->|banner SCOREBOARD_URL| S
+  W1 -.->|estado y flags| S
+  W2 -.->|estado y flags| S
 ```
 
 Cada lab tiene su propia base MariaDB. **No hay replicación** entre IDS y UWS. Por eso el scoreboard debe existir **una sola vez**: si se levanta en las dos VMs, los puntajes se duplican y no se sincronizan.
@@ -219,7 +219,7 @@ Aplicación Flask mínima:
 
 No tiene autenticación fuerte de jugadores ni rate limiting de producción. El reset falla cerrado si la variable de entorno no está definida; hay bloqueo temporal tras intentos fallidos.
 
-Los labs solo muestran un **banner con enlace** (`SCOREBOARD_URL`); no escriben en la base SQLite del tablero.
+Los labs consultan `GET /api/exercise` (pantalla de estado) y, con `LAB_SYNC_TOKEN`, `GET /api/exercise/flags`. No escriben en la SQLite del tablero: el estudiante envía la bandera en el formulario del scoreboard.
 
 ### 2.7 Contrato de puertos
 
@@ -229,7 +229,7 @@ Los labs solo muestran un **banner con enlace** (`SCOREBOARD_URL`); no escriben 
 | IDS SSH | VM1:2222 / localhost:2222 | 22 | SSH |
 | UWS web | VM2:8081 / localhost:8081 | 80 | HTTP Apache |
 | UWS SSH | VM2:2223 / localhost:2223 | 22 | SSH |
-| Scoreboard | VM3:9000 / localhost:9000 | 5000 | HTTP Flask |
+| Scoreboard | LXC:9000 / localhost:9000 | 5000 | HTTP Flask |
 | MariaDB | no publicado | 3306 | TCP interno |
 
 Todos los servicios usan `restart: unless-stopped`.
@@ -307,26 +307,30 @@ No hay JDBC, Hibernate, Node ni PostgreSQL en este repositorio. El conector de a
 
 | Variable | Componente | Uso |
 |----------|------------|-----|
-| `SCOREBOARD_URL` | labs | Banner hacia el tablero |
+| `SCOREBOARD_URL` | labs | Estado del ejercicio, banner y descarga de flags |
+| `LAB_ID` | labs | `ids` en ctf1, `uws` en ctf2 |
+| `LAB_SYNC_TOKEN` | labs y scoreboard | Secreto compartido para `GET /api/exercise/flags` |
 | `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` | labs | Conexión PHP → MariaDB |
-| `DB_ADMIN_USER`, `DB_ADMIN_PASS` | labs | Alta de usuarios desde el panel (ejercicio) |
-| `SCOREBOARD_RESET_PASSWORD` | scoreboard | `scoreboard/secrets.env` (no versionar secretos reales) |
+| `DB_ADMIN_USER`, `DB_ADMIN_PASS` | labs | Alta de usuarios desde el panel y escritura de `secrets` |
+| `SCOREBOARD_RESET_PASSWORD` | scoreboard | Panel de iniciar, parar, reiniciar y ver flags |
 | `SCOREBOARD_DB` | scoreboard | Ruta SQLite (default `/data/scoreboard.db`) |
 
 ### 3.6 Arranque de referencia
 
-**Clase (3 VMs):**
+**Clase (2 VMs + 1 LXC):**
 
 ```bash
+# LXC del scoreboard (nesting activo si usa Docker)
+cd scoreboard && docker compose up -d --build
+
 # VM1
-cd ctf1 && export SCOREBOARD_URL=http://<IP-SCOREBOARD>:9000 && docker compose up -d --build
+cd ctf1 && export SCOREBOARD_URL=http://<IP-LXC>:9000 LAB_SYNC_TOKEN=<token> && docker compose up -d --build
 
 # VM2
-cd ctf2 && export SCOREBOARD_URL=http://<IP-SCOREBOARD>:9000 && docker compose up -d --build
-
-# VM3
-cd scoreboard && docker compose up -d --build
+cd ctf2 && export SCOREBOARD_URL=http://<IP-LXC>:9000 LAB_SYNC_TOKEN=<token> && docker compose up -d --build
 ```
+
+El instructor inicia, detiene o reinicia la partida desde el tablero. Al iniciar o reiniciar, el scoreboard registra flags aleatorias y cada lab las descarga. Parar no apaga las VMs: cierra los envíos y muestra el estado en todas las estaciones.
 
 **Prueba local del instructor:**
 

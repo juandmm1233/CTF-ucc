@@ -7,4 +7,4 @@
 - Las credenciales internas estan en /home/admin/.env dentro de db_ssh.
 - Los respaldos antiguos viven en ../config/app.ini (fuera del bucket).
 
-Bandera de proximidad: FLAG{UCC_UWS_LFI_Found}
+Bandera de proximidad: FLAG{2eo_nq1lv1_ter}

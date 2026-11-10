@@ -14,6 +14,7 @@ services:
       - "8081:80"
     volumes:
       - ./servidor_web:/var/www/html
+      - lab_runtime:/lab_runtime
     environment:
       DB_HOST: db_ssh
       DB_PORT: "3306"
@@ -22,15 +23,17 @@ services:
       DB_ADMIN_USER: ctf_admin
       DB_ADMIN_PASS: ctf_admin_pass
       DB_NAME: ctf_login
-      # URL publica del scoreboard (debe correr en UNA sola VM, ver scoreboard/).
-      # Cambiar por la IP/host real, ej: http://10.0.0.50:9000
+      # URL del scoreboard en el LXC, ej: http://10.0.0.50:9000
+      # LAB_SYNC_TOKEN es el mismo valor que en scoreboard/secrets.env
       SCOREBOARD_URL: ${SCOREBOARD_URL:-}
+      LAB_ID: uws
+      LAB_SYNC_TOKEN: ${LAB_SYNC_TOKEN:-}
     depends_on:
       - db_ssh
     networks:
       - ctf_net2
     command: >
-      bash -c "apt-get update && apt-get install -y --no-install-recommends iputils-ping traceroute dnsutils && rm -rf /var/lib/apt/lists/* && docker-php-ext-install mysqli && apache2-foreground"
+      bash -c "apt-get update && apt-get install -y --no-install-recommends iputils-ping traceroute dnsutils && rm -rf /var/lib/apt/lists/* && docker-php-ext-install mysqli && echo 'auto_prepend_file=/var/www/html/includes/exercise_gate.php' > /usr/local/etc/php/conf.d/zz-exercise.ini && mkdir -p /lab_runtime /var/ctf-private && { while true; do php /var/www/html/includes/sync_exercise.php || true; sleep 3; done & } && exec apache2-foreground"
 
   db_ssh:
     build:
@@ -40,8 +43,13 @@ services:
     restart: unless-stopped
     ports:
       - "2223:22"
+    volumes:
+      - lab_runtime:/lab_runtime
     networks:
       - ctf_net2
+
+volumes:
+  lab_runtime:
 
 networks:
   ctf_net2:

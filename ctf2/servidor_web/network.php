@@ -77,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $host !== '') {
         <li><code>db_ssh</code> - instancia MariaDB + SSH</li>
         <li><code>web_app</code> - frontend PHP/Apache</li>
         <li><code>172.23.0.0/24</code> - red interna <code>ctf_net2</code></li>
+        <li><code>/var/ctf-private/cmd_flag.txt</code> - nota de diagnostico</li>
     </ul>
 </div>
 

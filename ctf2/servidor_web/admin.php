@@ -145,7 +145,11 @@ Roles aceptados: admin</pre>
         <div class="uws-card-subheader">
             <h2 class="uws-h2"><span class="material-icons">flag</span> Bandera intermedia</h2>
         </div>
-        <pre class="uws-code">FLAG{UCC_UWS_Cookie_Bypass}</pre>
+        <pre class="uws-code"><?php
+            require_once __DIR__ . '/includes/exercise_lib.php';
+            $ctfFlags = ctf_local_flags();
+            echo htmlspecialchars(isset($ctfFlags['cookie']) ? $ctfFlags['cookie'] : 'PENDIENTE');
+        ?></pre>
         <p class="uws-hint">La bandera final sigue alla afuera. Usa las credenciales SSH expuestas en
         <a href="compute.php">Compute</a> y revisa <code>/home/admin/</code>.</p>
     </div>
